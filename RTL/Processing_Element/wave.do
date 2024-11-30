@@ -3,14 +3,14 @@ quietly WaveActivateNextPane {} 0
 add wave -noupdate /Processing_Element_tb/CLK
 add wave -noupdate /Processing_Element_tb/RST
 add wave -noupdate /Processing_Element_tb/Load
-add wave -noupdate -radix decimal /Processing_Element_tb/Input
-add wave -noupdate -radix decimal /Processing_Element_tb/Weight
-add wave -noupdate -radix decimal /Processing_Element_tb/PsumIn
-add wave -noupdate -radix decimal /Processing_Element_tb/ToDown
-add wave -noupdate -radix decimal /Processing_Element_tb/PsumOut
-add wave -noupdate -radix decimal /Processing_Element_tb/ToRight
+add wave -noupdate -radix unsigned /Processing_Element_tb/Input
+add wave -noupdate -radix unsigned /Processing_Element_tb/Weight
+add wave -noupdate -radix unsigned /Processing_Element_tb/PsumIn
+add wave -noupdate -radix unsigned /Processing_Element_tb/ToDown
+add wave -noupdate -radix unsigned /Processing_Element_tb/PsumOut
+add wave -noupdate -radix unsigned /Processing_Element_tb/ToRight
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {31900 ps} 0}
+WaveRestoreCursors {{Cursor 1} {42512 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
