@@ -1,0 +1,12 @@
+*.dat
+*.mti
+*.mpf
+*.wlf
+*.dbs
+*.vhd
+*.prw
+*.psm
+*_info
+*_vmake
+/RTL/Multipliers/Carry_Save_Multiplier/work/_temp
+/RTL/Processing_Element/work/_temp
