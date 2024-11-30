@@ -1,0 +1,54 @@
+module Carry_Save_Multiplier #(parameter WIDTH=8) (
+    input  wire [WIDTH-1:0]   A,
+    input  wire [WIDTH-1:0]   B,
+    output wire [2*WIDTH:0] C
+);
+    wire [WIDTH+1:0] sum   [WIDTH:0];
+    wire [WIDTH+1:0] carry [WIDTH:0];
+
+    genvar i, j;
+    generate
+        for (i = 0; i <= WIDTH; i = i + 1) begin : gen_i
+            for (j = 0; j <= WIDTH - 1; j = j + 1) begin : gen_j
+                if (i == 0) begin
+                    Math_Multiplier ma (
+                        .A(A[j]),
+                        .B(B[i]),
+                        .C(0),
+                        .Cin(0),
+                        .S(sum[i][j]),
+                        .Cout(carry[i][j])
+                    );
+                end
+                else if (i == WIDTH) begin
+                    Math_Multiplier ma (
+                        .A(1'b1),
+                        .B((j == 0) ? 0 : carry[i][j-1]),
+                        .C((j == WIDTH-1) ? 0 : sum[i-1][j+1]),
+                        .Cin(carry[i-1][j]),
+                        .S(sum[i][j]),
+                        .Cout(carry[i][j])
+                    );
+                end
+                else begin
+                    Math_Multiplier ma (
+                        .A(A[j]),
+                        .B(B[i]),
+                        .C((j == WIDTH-1) ? 0 : sum[i-1][j+1]),
+                        .Cin(carry[i-1][j]),
+                        .S(sum[i][j]),
+                        .Cout(carry[i][j])
+                    );
+                end
+
+                if (i == WIDTH) begin
+                    assign C[i+j] = sum[i][j];
+                end
+            end
+            if (i != WIDTH) begin
+                assign C[i] = sum[i][0];
+            end
+            assign C[2*WIDTH] = carry[WIDTH][WIDTH-1];
+        end
+    endgenerate
+endmodule
