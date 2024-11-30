@@ -8,7 +8,7 @@ module Carry_Save_Multiplier_tb ();
     Carry_Save_Multiplier #(WIDTH) DUT (
         .A(A),
         .B(B),
-        .C(C)
+        .P(C)
     );
     
     initial begin

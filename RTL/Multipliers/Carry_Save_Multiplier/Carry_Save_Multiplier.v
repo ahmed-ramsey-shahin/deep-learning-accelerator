@@ -1,7 +1,7 @@
 module Carry_Save_Multiplier #(parameter WIDTH=8) (
     input  wire [WIDTH-1:0]   A,
     input  wire [WIDTH-1:0]   B,
-    output wire [2*WIDTH:0] C
+    output wire [2*WIDTH-1:0] P
 );
     wire [WIDTH+1:0] sum   [WIDTH:0];
     wire [WIDTH+1:0] carry [WIDTH:0];
@@ -42,13 +42,12 @@ module Carry_Save_Multiplier #(parameter WIDTH=8) (
                 end
 
                 if (i == WIDTH) begin
-                    assign C[i+j] = sum[i][j];
+                    assign P[i+j] = sum[i][j];
                 end
             end
             if (i != WIDTH) begin
-                assign C[i] = sum[i][0];
+                assign P[i] = sum[i][0];
             end
-            assign C[2*WIDTH] = carry[WIDTH][WIDTH-1];
         end
     endgenerate
 endmodule
