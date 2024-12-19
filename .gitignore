@@ -6,6 +6,9 @@
 *.vhd
 *.prw
 *.psm
+*.qtl
+*.qpg
+*.qdb
 *_info
 *_vmake
 /RTL/Multipliers/Carry_Save_Multiplier/work/_temp
