@@ -1,14 +1,14 @@
 module Processing_Element #(parameter WIDTH=8) (
-    input  wire               CLK,
-    input  wire               ASYNC_RST,
-    input  wire               SYNC_RST,
-    input  wire               EN,
-    input  wire [WIDTH-1:0]   Input,
-    input  wire [WIDTH-1:0]   Weight,
-    input  wire [2*WIDTH-1:0] PsumIn,
-    output reg  [WIDTH-1:0]   ToRight,
-    output reg  [WIDTH-1:0]   ToDown,
-    output reg  [2*WIDTH:0]   PsumOut
+    input  wire                 CLK,
+    input  wire                 ASYNC_RST,
+    input  wire                 SYNC_RST,
+    input  wire                 EN,
+    input  wire [WIDTH-1:0]     Input,
+    input  wire [WIDTH-1:0]     Weight,
+    input  wire [2*WIDTH-1:0]   PsumIn,
+    output reg  [WIDTH-1:0]     ToRight,
+    output reg  [WIDTH-1:0]     ToDown,
+    output reg  [2*WIDTH-1:0]   PsumOut
 );
     wire [2*WIDTH-1:0] mult_out;
     

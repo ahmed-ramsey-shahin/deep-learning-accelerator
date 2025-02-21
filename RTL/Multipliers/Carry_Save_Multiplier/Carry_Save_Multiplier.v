@@ -14,8 +14,8 @@ module Carry_Save_Multiplier #(parameter WIDTH=8) (
                     Math_Multiplier ma (
                         .A(A[j]),
                         .B(B[i]),
-                        .C(0),
-                        .Cin(0),
+                        .C(1'b0),
+                        .Cin(1'b0),
                         .S(sum[i][j]),
                         .Cout(carry[i][j])
                     );
@@ -23,8 +23,8 @@ module Carry_Save_Multiplier #(parameter WIDTH=8) (
                 else if (i == WIDTH) begin
                     Math_Multiplier ma (
                         .A(1'b1),
-                        .B((j == 0) ? 0 : carry[i][j-1]),
-                        .C((j == WIDTH-1) ? 0 : sum[i-1][j+1]),
+                        .B((j == 0) ? 1'b0 : carry[i][j-1]),
+                        .C((j == WIDTH-1) ? 1'b0 : sum[i-1][j+1]),
                         .Cin(carry[i-1][j]),
                         .S(sum[i][j]),
                         .Cout(carry[i][j])
@@ -34,7 +34,7 @@ module Carry_Save_Multiplier #(parameter WIDTH=8) (
                     Math_Multiplier ma (
                         .A(A[j]),
                         .B(B[i]),
-                        .C((j == WIDTH-1) ? 0 : sum[i-1][j+1]),
+                        .C((j == WIDTH-1) ? 1'b0 : sum[i-1][j+1]),
                         .Cin(carry[i-1][j]),
                         .S(sum[i][j]),
                         .Cout(carry[i][j])
