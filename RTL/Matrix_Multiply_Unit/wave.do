@@ -6,9 +6,9 @@ add wave -noupdate -radix unsigned /Matrix_Multiply_Unit_tb/ASYNC_RST
 add wave -noupdate -radix unsigned /Matrix_Multiply_Unit_tb/SYNC_RST
 add wave -noupdate -radix unsigned /Matrix_Multiply_Unit_tb/Inputs
 add wave -noupdate -radix unsigned /Matrix_Multiply_Unit_tb/Weights
-add wave -noupdate -radix unsigned /Matrix_Multiply_Unit_tb/PsumOut
+add wave -noupdate -radix unsigned -childformat {{{/Matrix_Multiply_Unit_tb/DUT/Result[0]} -radix unsigned} {{/Matrix_Multiply_Unit_tb/DUT/Result[1]} -radix unsigned} {{/Matrix_Multiply_Unit_tb/DUT/Result[2]} -radix unsigned}} -subitemconfig {{/Matrix_Multiply_Unit_tb/DUT/Result[0]} {-radix unsigned} {/Matrix_Multiply_Unit_tb/DUT/Result[1]} {-radix unsigned} {/Matrix_Multiply_Unit_tb/DUT/Result[2]} {-radix unsigned}} /Matrix_Multiply_Unit_tb/DUT/Result
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {42804 ps} 0}
+WaveRestoreCursors {{Cursor 1} {21714 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100

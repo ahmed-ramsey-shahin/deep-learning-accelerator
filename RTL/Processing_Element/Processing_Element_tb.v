@@ -8,10 +8,9 @@ module Processing_Element_tb ();
     reg                EN;
     reg  [WIDTH-1:0]   Input;
     reg  [WIDTH-1:0]   Weight;
-    reg  [2*WIDTH-1:0] PsumIn;
     wire [WIDTH-1:0]   ToRight;
     wire [WIDTH-1:0]   ToDown;
-    wire [2*WIDTH:0]   PsumOut;
+    wire [2*WIDTH-1:0] Result;
 
     Processing_Element DUT (
         .CLK       (CLK),
@@ -20,10 +19,9 @@ module Processing_Element_tb ();
         .EN        (EN),
         .Input     (Input),
         .Weight    (Weight),
-        .PsumIn    (PsumIn),
         .ToRight   (ToRight),
         .ToDown    (ToDown),
-        .PsumOut   (PsumOut)
+        .Result    (Result)
     );
 
     always begin
@@ -35,7 +33,6 @@ module Processing_Element_tb ();
 
     initial begin
         ASYNC_RST = 1'b0;
-        PsumIn    = 16'd0;
         Input     = 8'd0;
         Weight    = 8'd0;
         #2;
@@ -45,7 +42,6 @@ module Processing_Element_tb ();
         Weight = 8'd3;
         EN     = 1'b1;
         @(negedge CLK);
-        PsumIn = 16'd15;
         Input  = 8'd7;
         Weight = 8'd2;
         EN     = 1'b1;
