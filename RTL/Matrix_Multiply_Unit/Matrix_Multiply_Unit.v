@@ -3,8 +3,8 @@ module Matrix_Multiply_Unit #(parameter WIDTH=8, parameter LENGTH=256) (
     input wire                      ASYNC_RST,
     input wire                      SYNC_RST,
     input wire                      EN,
-    input wire [(WIDTH*LENGTH)-1:0] INPUTS,
-    input wire [(WIDTH*LENGTH)-1:0] WEIGHTS
+    input wire [(WIDTH*LENGTH)-1:0] Inputs,
+    input wire [(WIDTH*LENGTH)-1:0] Weights
 );
     genvar row;
     genvar col;
