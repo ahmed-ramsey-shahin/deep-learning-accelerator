@@ -2,41 +2,55 @@
 
 module Processing_Element_tb ();
     localparam WIDTH = 8;
-    reg                CLK = 0;
-    reg                RST;
-    reg                Load;
+    reg                CLK;
+    reg                ASYNC_RST;
+    reg                SYNC_RST;
+    reg                EN;
     reg  [WIDTH-1:0]   Input;
     reg  [WIDTH-1:0]   Weight;
     reg  [2*WIDTH-1:0] PsumIn;
     wire [WIDTH-1:0]   ToRight;
     wire [WIDTH-1:0]   ToDown;
-    wire [2*WIDTH-1:0] PsumOut;
-    
-    always #10 CLK = ~CLK;
+    wire [2*WIDTH:0]   PsumOut;
 
-    Processing_Element #(WIDTH) DUT (
-        .CLK(CLK),
-        .RST(RST),
-        .Input(Input),
-        .Weight(Weight),
-        .PsumIn(PsumIn),
-        .PsumOut(PsumOut),
-        .ToRight(ToRight),
-        .ToDown(ToDown),
-        .Load(Load)
+    Processing_Element DUT (
+        .CLK       (CLK),
+        .ASYNC_RST (ASYNC_RST),
+        .SYNC_RST  (SYNC_RST),
+        .EN        (EN),
+        .Input     (Input),
+        .Weight    (Weight),
+        .PsumIn    (PsumIn),
+        .ToRight   (ToRight),
+        .ToDown    (ToDown),
+        .PsumOut   (PsumOut)
     );
 
-    initial begin
-        RST = 1'b0;
-        #2;
-        RST = 1'b1;
-        Weight = 8'd5;
-        @(negedge CLK) Load = 1'b1;
-        @(negedge CLK) Load = 1'b0;
-        Input = 8'd6;
-        PsumIn = 8'd15;
+    always begin
+        CLK = 1'b1;
         #10;
-        $display("(%d x %d) + %d = %d", Weight, Input, PsumIn, PsumOut);
+        CLK = 1'b0;
+        #10;
+    end
+
+    initial begin
+        ASYNC_RST = 1'b0;
+        PsumIn    = 16'd0;
+        Input     = 8'd0;
+        Weight    = 8'd0;
+        #2;
+        ASYNC_RST = 1'b1;
+        @(negedge CLK);
+        Input  = 8'd5;
+        Weight = 8'd3;
+        EN     = 1'b1;
+        @(negedge CLK);
+        PsumIn = 16'd15;
+        Input  = 8'd7;
+        Weight = 8'd2;
+        EN     = 1'b1;
+        repeat(2) @(negedge CLK);
         $stop;
     end
+
 endmodule
