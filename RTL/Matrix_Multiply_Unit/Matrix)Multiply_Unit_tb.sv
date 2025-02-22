@@ -10,8 +10,20 @@ module Matrix_Multiply_Unit_tb ();
     reg  [WIDTH-1:0]   Inputs  [0:LENGTH-1];
     reg  [WIDTH-1:0]   Weights [0:LENGTH-1];
     wire [2*WIDTH-1:0] Result  [0:LENGTH-1][0:LENGTH-1];
-    integer i;
-    integer j;
+    int row;
+    int col;
+    int counter = 0;
+    int MatrixA[LENGTH][LENGTH] = '{
+        '{4, 3, 7},
+        '{4, 4, 7},
+        '{6, 8, 2}
+    };
+
+    int MatrixB[LENGTH][LENGTH] = '{
+        '{9, 4, 5},
+        '{10, 4, 5},
+        '{7, 4, 7}
+    };
 
     always begin
         CLK = 1'b1;
@@ -34,56 +46,56 @@ module Matrix_Multiply_Unit_tb ();
         ASYNC_RST = 1'b0;
         EN        = 1'b0;
         SYNC_RST  = 1'b0;
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            Inputs[i]  = 0;
-            Weights[i] = 0;
+        row       = 0;
+        col       = 0;
+        for (row = 0; row < LENGTH; row = row + 1) begin
+            Inputs[row]  = 0;
+            Weights[row] = 0;
         end
         #2;
         ASYNC_RST = 1'b1;
+
         @(negedge CLK);
-        EN         = 1'b1;
-        Inputs[0]  = 8'd1;
-        Weights[0] = 8'd1;
-        Inputs[1]  = 8'd0;
-        Weights[1] = 8'd0;
-        Inputs[2]  = 8'd0;
-        Weights[2] = 8'd0;
-        @(negedge CLK);
-        Inputs[0]  = 8'd2;
-        Weights[0] = 8'd2;
-        Inputs[1]  = 8'd4;
-        Weights[1] = 8'd2;
-        Inputs[2]  = 8'd0;
-        Weights[2] = 8'd0;
-        @(negedge CLK);
-        Inputs[0]  = 8'd3;
-        Weights[0] = 8'd7;
-        Inputs[1]  = 8'd5;
-        Weights[1] = 8'd4;
-        Inputs[2]  = 8'd7;
-        Weights[2] = 8'd1;
-        @(negedge CLK);
-        Inputs[0]  = 8'd0;
-        Weights[0] = 8'd0;
-        Inputs[1]  = 8'd6;
-        Weights[1] = 8'd2;
-        Inputs[2]  = 8'd8;
-        Weights[2] = 8'd6;
-        @(negedge CLK);
-        Inputs[0]  = 8'd0;
-        Weights[0] = 8'd0;
-        Inputs[1]  = 8'd0;
-        Weights[1] = 8'd0;
-        Inputs[2]  = 8'd9;
-        Weights[2] = 8'd5;
-        @(negedge CLK);
-        Inputs[0]  = 8'd0;
-        Weights[0] = 8'd0;
-        Inputs[1]  = 8'd0;
-        Weights[1] = 8'd0;
-        Inputs[2]  = 8'd0;
-        Weights[2] = 8'd0;
-        repeat(9) @(negedge CLK);
+        EN = 1'b1;
+        $display(MatrixA);
+        for (col = 1; col < 2 * LENGTH; col = col + 1) begin
+            for (row = 0; row < LENGTH; row = row + 1) begin
+                if (col < LENGTH) begin
+                    if (row < col) begin
+                        Inputs[row]  = MatrixA[row][col-row-1];
+                        Weights[row] = MatrixB[col-row-1][row];
+                    end
+                    else begin
+                        Inputs[row]  = {WIDTH{1'b0}};
+                        Weights[row] = {WIDTH{1'b0}};
+                    end
+                end
+                else if (col == LENGTH) begin
+                    Inputs[row]  = MatrixA[row][col-row-1];
+                    Weights[row] = MatrixB[col-row-1][row];
+                end
+                else if (col > LENGTH) begin
+                    if (row < col - LENGTH) begin
+                        Inputs[row]  = {WIDTH{1'b0}};
+                        Weights[row] = {WIDTH{1'b0}};
+                    end
+                    else begin
+                        Inputs[row]  = MatrixA[row][col-row-1];
+                        Weights[row] = MatrixB[col-row-1][row];
+                    end
+                end
+            end
+            @(negedge CLK);
+        end
+        for (row = 0; row < LENGTH; row = row + 1) begin
+            Inputs[row]  = 0;
+            Weights[row] = 0;
+        end
+    end
+
+    initial begin
+        repeat(3*LENGTH-2) @(negedge CLK) counter = counter + 1;
+        repeat(2) @(negedge CLK);
         $stop;
     end
 endmodule

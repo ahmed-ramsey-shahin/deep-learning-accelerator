@@ -48,5 +48,4 @@ module Processing_Element_tb ();
         repeat(2) @(negedge CLK);
         $stop;
     end
-
 endmodule
