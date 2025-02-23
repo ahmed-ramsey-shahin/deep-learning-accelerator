@@ -14,9 +14,9 @@ module Matrix_Multiply_Unit #(parameter WIDTH=8, parameter LENGTH=256) (
     wire [WIDTH-1:0] ToDown  [0:LENGTH-1][0:LENGTH-1];
 
     generate
-        for (row = 0; row < LENGTH; row = row + 1) begin : row_gen
-            for (col = 0; col < LENGTH; col = col + 1) begin : col_gen
-                if (row == 0 & col == 0) begin
+        for (row = 0; row < LENGTH; row = row + 1) begin : gen_row
+            for (col = 0; col < LENGTH; col = col + 1) begin : gen_col
+                if (row == 0 & col == 0) begin : gen_first_PE
                     Processing_Element #(WIDTH) PE (
                         .CLK(CLK),
                         .ASYNC_RST(ASYNC_RST),
@@ -29,7 +29,7 @@ module Matrix_Multiply_Unit #(parameter WIDTH=8, parameter LENGTH=256) (
                         .Result(Result[row][col])
                     );
                 end
-                else if (row == 0 & col != 0) begin
+                else if (row == 0 & col != 0) begin : gen_first_row_PE
                     Processing_Element #(WIDTH) PE (
                         .CLK(CLK),
                         .ASYNC_RST(ASYNC_RST),
@@ -42,7 +42,7 @@ module Matrix_Multiply_Unit #(parameter WIDTH=8, parameter LENGTH=256) (
                         .Result(Result[row][col])
                     );
                 end
-                else if (row != 0 & col == 0) begin
+                else if (row != 0 & col == 0) begin : gen_first_col_PE
                     Processing_Element #(WIDTH) PE (
                         .CLK(CLK),
                         .ASYNC_RST(ASYNC_RST),
@@ -55,7 +55,7 @@ module Matrix_Multiply_Unit #(parameter WIDTH=8, parameter LENGTH=256) (
                         .Result(Result[row][col])
                     );
                 end
-                else begin
+                else begin : gen_PE
                     Processing_Element #(WIDTH) PE (
                         .CLK(CLK),
                         .ASYNC_RST(ASYNC_RST),
