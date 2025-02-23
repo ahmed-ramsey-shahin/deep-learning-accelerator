@@ -7,11 +7,13 @@ module Matrix_Multiply_Unit_tb ();
     reg                ASYNC_RST;
     reg                SYNC_RST;
     reg                EN;
+    reg                TestCasePassed;
     reg  [WIDTH-1:0]   Inputs  [0:LENGTH-1];
     reg  [WIDTH-1:0]   Weights [0:LENGTH-1];
     wire [2*WIDTH-1:0] Result  [0:LENGTH-1][0:LENGTH-1];
-    int row;
-    int col;
+    int row, i;
+    int col, j;
+    int k;
     int counter = 0;
     int MatrixA[LENGTH][LENGTH] = '{
         '{4, 3, 7},
@@ -24,6 +26,7 @@ module Matrix_Multiply_Unit_tb ();
         '{10, 4, 5},
         '{7, 4, 7}
     };
+    int ExpectedResult[LENGTH][LENGTH];
 
     always begin
         CLK = 1'b1;
@@ -94,8 +97,30 @@ module Matrix_Multiply_Unit_tb ();
     end
 
     initial begin
-        repeat(3*LENGTH-2) @(negedge CLK) counter = counter + 1;
-        repeat(2) @(negedge CLK);
+        TestCasePassed = 1'b1;
+        for (i = 0; i < LENGTH; i = i + 1) begin
+            for (j = 0; j < LENGTH; j = j + 1) begin
+                for (k = 0; k < LENGTH; k = k + 1) begin
+                    ExpectedResult[i][j] = ExpectedResult[i][j] + (MatrixA[i][k] * MatrixB[k][j]);
+                end
+            end
+        end
+        repeat(3*LENGTH-1) @(posedge CLK) counter = counter + 1;
+        for (i = 0; i < LENGTH; i = i + 1) begin
+            for (j = 0; j < LENGTH; j = j + 1) begin
+                if (ExpectedResult[i][j] != Result[i][j]) begin
+                    TestCasePassed = 1'b0;
+                    $display("Test Case did not Pass");
+                    break;
+                end
+            end
+            if (TestCasePassed == 1'b0) begin
+                break;
+            end
+        end
+        if (TestCasePassed == 1'b1) begin
+            $display("Test Case Passed :3");
+        end
         $stop;
     end
 endmodule
