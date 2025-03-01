@@ -10,7 +10,7 @@ module Carry_Save_Multiplier_tb ();
         .B(B),
         .P(C)
     );
-    
+
     initial begin
         for (A = 0; A <= 8'hFF; A = A + 1) begin
             for (B = 0; B <= 8'hFF; B = B + 1) begin
