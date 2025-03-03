@@ -94,3 +94,4 @@ module wallace_tree_multiplier_8x8(A, B, P);
 	assign P[15] = fa_c[12];
 	
 endmodule
+

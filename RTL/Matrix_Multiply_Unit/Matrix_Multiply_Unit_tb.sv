@@ -1,17 +1,16 @@
 `timescale 1ns/1ps
 
 module Matrix_Multiply_Unit_tb ();
-    localparam                   WIDTH             = 8;
-    localparam                   ACCUMULATOR_WIDTH = 32;
-    localparam                   LENGTH            = 3;
-    reg                          CLK;
-    reg                          ASYNC_RST;
-    reg                          SYNC_RST;
-    reg                          EN;
-    reg                          TestCasePassed;
-    reg  [WIDTH-1:0]             Inputs  [0:LENGTH-1];
-    reg  [WIDTH-1:0]             Weights [0:LENGTH-1];
-    wire [ACCUMULATOR_WIDTH-1:0] Result  [0:LENGTH-1][0:LENGTH-1];
+    localparam         WIDTH  = 8;
+    localparam         LENGTH = 3;
+    reg                CLK;
+    reg                ASYNC_RST;
+    reg                SYNC_RST;
+    reg                EN;
+    reg                TestCasePassed;
+    reg  [WIDTH-1:0]   Inputs  [0:LENGTH-1];
+    reg  [WIDTH-1:0]   Weights [0:LENGTH-1];
+    wire [2*WIDTH-1:0] Result  [0:LENGTH-1][0:LENGTH-1];
     int row, i;
     int col, j;
     int k;
@@ -36,11 +35,7 @@ module Matrix_Multiply_Unit_tb ();
         #5;
     end
 
-    Matrix_Multiply_Unit #(
-        .WIDTH(WIDTH),
-        .LENGTH(LENGTH),
-        .ACCUMULATOR_WIDTH(ACCUMULATOR_WIDTH)
-    ) DUT (
+    Matrix_Multiply_Unit #(.WIDTH(WIDTH), .LENGTH(LENGTH)) DUT (
         .CLK(CLK),
         .ASYNC_RST(ASYNC_RST),
         .SYNC_RST(SYNC_RST),
@@ -129,3 +124,4 @@ module Matrix_Multiply_Unit_tb ();
         $stop;
     end
 endmodule
+

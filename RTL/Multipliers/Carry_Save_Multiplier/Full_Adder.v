@@ -9,3 +9,4 @@ module Full_Adder (
         {Cout, S} = A + B + Cin;
     end
 endmodule
+

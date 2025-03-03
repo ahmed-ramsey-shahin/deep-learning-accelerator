@@ -52,3 +52,4 @@ module wallace_tree_multiplier_8x8_tb();
         $stop;
     end
 endmodule
+
