@@ -11,6 +11,7 @@
 *.qdb
 *_info
 *_vmake
+*.txt
 /RTL/Multipliers/Carry_Save_Multiplier/work/*
 /RTL/Multipliers/Wallace_Tree_Multiplier/work/*
 /RTL/Processing_Element/work/*

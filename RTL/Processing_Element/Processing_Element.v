@@ -1,10 +1,15 @@
-module Processing_Element #(parameter WIDTH=8, parameter ACCUMULATOR_WIDTH=32) (
+module Processing_Element #(
+    parameter WIDTH=8,
+    parameter ACCUMULATOR_WIDTH=32
+) (
     input  wire                         CLK,
     input  wire                         ASYNC_RST,
     input  wire                         SYNC_RST,
     input  wire                         EN,
+    input  wire                         LOAD,
     input  wire [WIDTH-1:0]             Input,
     input  wire [WIDTH-1:0]             Weight,
+    input  wire [ACCUMULATOR_WIDTH-1:0] PsumIn,
     output reg  [WIDTH-1:0]             ToRight,
     output reg  [WIDTH-1:0]             ToDown,
     output reg  [ACCUMULATOR_WIDTH-1:0] Result
@@ -13,7 +18,7 @@ module Processing_Element #(parameter WIDTH=8, parameter ACCUMULATOR_WIDTH=32) (
 
     Carry_Save_Multiplier #(WIDTH) mult (
         .A(Input),
-        .B(Weight),
+        .B(ToDown),
         .P(mult_out)
     );
 
@@ -24,9 +29,13 @@ module Processing_Element #(parameter WIDTH=8, parameter ACCUMULATOR_WIDTH=32) (
             Result     <= 'd0;
         end
         else if (EN) begin
-            ToRight    <= Input;
-            ToDown     <= Weight;
-            Result     <= Result + mult_out;
+            if (LOAD) begin
+                ToDown <= Weight;
+            end
+            else begin
+                ToRight <= Input;
+                Result <= PsumIn + mult_out;
+            end
         end
     end
 endmodule
