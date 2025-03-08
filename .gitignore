@@ -16,3 +16,4 @@
 /RTL/Multipliers/Wallace_Tree_Multiplier/work/*
 /RTL/Processing_Element/work/*
 /RTL/Matrix_Multiply_Unit/work/*
+/RTL/Accumulators/work/*

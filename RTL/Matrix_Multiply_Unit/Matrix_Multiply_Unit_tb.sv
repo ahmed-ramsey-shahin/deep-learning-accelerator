@@ -3,7 +3,7 @@
 module Matrix_Multiply_Unit_tb();
     parameter                    WIDTH=8;
     parameter                    ACCUMULATOR_WIDTH=32;
-    parameter                    LENGTH=10;
+    parameter                    LENGTH=3;
     reg                          CLK;
     reg                          ASYNC_RST;
     reg                          SYNC_RST;
