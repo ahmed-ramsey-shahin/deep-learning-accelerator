@@ -17,3 +17,9 @@
 /RTL/Processing_Element/work/*
 /RTL/Matrix_Multiply_Unit/work/*
 /RTL/Accumulators/work/*
+/RTL/Activations/work/*
+/RTL/Activations/ReLU/work/*
+/RTL/Activations/Sigmoid/work/*
+/RTL/Activations/Softmax/work/*
+/RTL/Activations/Tanh/work/*
+
