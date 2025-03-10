@@ -60,7 +60,7 @@ module Systolic_Data_Setup_tb();
     initial begin
         reset();
         load_input();
-        repeat(6) @(posedge CLK);
+        repeat(LENGTH) @(posedge CLK);
         $stop;
     end
 endmodule

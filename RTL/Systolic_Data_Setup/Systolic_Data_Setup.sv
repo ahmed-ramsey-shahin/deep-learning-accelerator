@@ -35,11 +35,11 @@ module Systolic_Data_Setup #(
     endgenerate
 
     generate
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            if (i == 0) begin
+        for (i = 0; i < LENGTH; i = i + 1) begin : gen_output
+            if (i == 0) begin : gen_not_registered
                 assign Outputs[i] = Inputs[i];
             end
-            else begin
+            else begin : gen_registered
                 assign Outputs[i] = delays[((i*(i-1))/2)];
             end
         end
