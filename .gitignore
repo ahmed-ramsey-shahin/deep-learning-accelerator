@@ -23,4 +23,5 @@
 /RTL/Activations/Softmax/work/*
 /RTL/Activations/Tanh/work/*
 /RTL/Systolic_Data_Setup/work/*
-
+node_modules/*
+*.json
