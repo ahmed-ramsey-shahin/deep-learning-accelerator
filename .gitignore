@@ -22,4 +22,5 @@
 /RTL/Activations/Sigmoid/work/*
 /RTL/Activations/Softmax/work/*
 /RTL/Activations/Tanh/work/*
+/RTL/Systolic_Data_Setup/work/*
 
