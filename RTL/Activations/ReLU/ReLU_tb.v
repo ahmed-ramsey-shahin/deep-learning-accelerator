@@ -1,17 +1,33 @@
-module ReLU_tb ();
-    parameter WIDTH = 8;
-    
-    reg [WIDTH-1:0] in;
-    wire [WIDTH-1:0]out;
+module ReLU_tb ();    
+    reg signed [23:0] in;
+    wire signed [7:0]out;
 
-    ReLU #(WIDTH) dut(in, out);
+    ReLU dut(in, out);
 
     initial begin
-        in = 8'b00000000;
-        #10 in = 8'b01111111;
-        #10 in = 8'b10000000;
-        #10 in = 8'b10001100;
-        #10 in = 8'b00001100;
+        in = 5;
+        #10;
+        
+        in = 200;
+        #10;
+        
+        in = 65535;
+        #10;
+        
+        in = 65536;
+        #10;
+
+        in = 6553600;
+        #10;
+        
+        in = 8388607;
+        #10;
+        
+        in = -5;
+        #10;
+
+        in = -8388608;
+        #10;
     end
 
 endmodule
