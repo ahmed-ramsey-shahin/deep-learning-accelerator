@@ -1,6 +1,6 @@
 module Processing_Element #(
-    parameter DATA_WIDTH=8,
-    parameter ACCUMULATOR_DATA_WIDTH=32
+    parameter int DATA_WIDTH=8,
+    parameter int ACCUMULATOR_DATA_WIDTH=32
 ) (
     input  wire                                     CLK,
     input  wire                                     ASYNC_RST,
