@@ -1,20 +1,20 @@
 `timescale 1ns/1ps
 
 module Systolic_Data_Setup_tb();
-    localparam       WIDTH=8;
-    localparam       LENGTH=5;
+    localparam       DATA_WIDTH=8;
+    localparam       SA_LENGTH=5;
     reg              CLK;
     reg              ASYNC_RST;
     reg              SYNC_RST;
     reg              EN;
-    reg  [WIDTH-1:0] Inputs  [0:LENGTH-1];
-    wire [WIDTH-1:0] Outputs [0:LENGTH-1];
+    reg  [DATA_WIDTH-1:0] Inputs  [0:SA_LENGTH-1];
+    wire [DATA_WIDTH-1:0] Outputs [0:SA_LENGTH-1];
     int i;
     int j;
 
     Systolic_Data_Setup #(
-        .WIDTH(WIDTH),
-        .LENGTH(LENGTH)
+        .DATA_WIDTH(WIDTH),
+        .SA_LENGTH(SA_LENGTH)
     ) DUT (
         .CLK(CLK),
         .ASYNC_RST(ASYNC_RST),
@@ -36,8 +36,8 @@ module Systolic_Data_Setup_tb();
         ASYNC_RST = 1'b0;
         SYNC_RST  = 1'b0;
         EN        = 1'b0;
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            Inputs[i] = {WIDTH{1'b0}};
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            Inputs[i] = {DATA_WIDTH{1'b0}};
         end
         #2;
         ASYNC_RST = 1'b1;
@@ -48,8 +48,8 @@ module Systolic_Data_Setup_tb();
     task static load_input;
     begin
         @(posedge CLK);
-        for (j = 0; j < LENGTH; j = j + 1) begin
-            for (i = 0; i < LENGTH; i = i + 1) begin
+        for (j = 0; j < SA_LENGTH; j = j + 1) begin
+            for (i = 0; i < SA_LENGTH; i = i + 1) begin
                 Inputs[i] = $urandom_range(0, 10);
             end
             @(posedge CLK);
@@ -60,7 +60,7 @@ module Systolic_Data_Setup_tb();
     initial begin
         reset();
         load_input();
-        repeat(LENGTH) @(posedge CLK);
+        repeat(SA_LENGTH) @(posedge CLK);
         $stop;
     end
 endmodule

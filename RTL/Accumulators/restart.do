@@ -1,2 +1,0 @@
-restart -f
-run -all
