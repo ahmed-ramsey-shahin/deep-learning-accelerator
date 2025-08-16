@@ -1,7 +1,7 @@
 module Matrix_Multiply_Unit #(
-    parameter int DATA_WIDTH=8,
-    parameter int ACCUMULATOR_DATA_WIDTH=32,
-    parameter int SA_LENGTH=256
+    parameter integer DATA_WIDTH=8,
+    parameter integer ACCUMULATOR_DATA_WIDTH=32,
+    parameter integer SA_LENGTH=256
 ) (
     input  wire                                     CLK,
     input  wire                                     ASYNC_RST,
@@ -13,8 +13,15 @@ module Matrix_Multiply_Unit #(
 );
     genvar row;
     genvar col;
-    wire signed [DATA_WIDTH-1:0] ToRight [SA_LENGTH][SA_LENGTH];
-    wire signed [DATA_WIDTH-1:0] Psum    [SA_LENGTH][SA_LENGTH];
+    genvar i;
+    wire signed [DATA_WIDTH-1:0]             ToRight [SA_LENGTH][SA_LENGTH];
+    wire signed [ACCUMULATOR_DATA_WIDTH-1:0] Psum    [SA_LENGTH][SA_LENGTH];
+
+    generate
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin : gen_result
+            assign Result[i] = Psum[SA_LENGTH-1][i];
+        end
+    endgenerate
 
     generate
         for (row = 0; row < SA_LENGTH; row = row + 1) begin : gen_row
@@ -45,7 +52,7 @@ module Matrix_Multiply_Unit #(
                         .SYNC_RST(SYNC_RST),
                         .EN(EN),
                         .LOAD(LOAD),
-                        .Input(Psum[row][col-1]),
+                        .Input(ToRight[row][col-1]),
                         .PsumIn('b0),
                         .ToRight(ToRight[row][col]),
                         .PsumOut(Psum[row][col])
@@ -64,7 +71,7 @@ module Matrix_Multiply_Unit #(
                         .Input(Inputs[row]),
                         .PsumIn(Psum[row-1][col]),
                         .ToRight(ToRight[row][col]),
-                        .PsumOut((row == SA_LENGTH-1) ? Result[col] : Psum[row][col])
+                        .PsumOut(Psum[row][col])
                     );
                 end
                 else begin : gen_PE
@@ -80,7 +87,7 @@ module Matrix_Multiply_Unit #(
                         .Input(ToRight[row][col-1]),
                         .PsumIn(Psum[row-1][col]),
                         .ToRight(ToRight[row][col]),
-                        .PsumOut((row == SA_LENGTH-1) ? Result[col] : Psum[row][col])
+                        .PsumOut(Psum[row][col])
                     );
                 end
             end

@@ -28,3 +28,4 @@
 *transcript
 node_modules/*
 *.json
+*.wcfg

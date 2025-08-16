@@ -1,6 +1,6 @@
 module Processing_Element #(
-    parameter int DATA_WIDTH=8,
-    parameter int ACCUMULATOR_DATA_WIDTH=32
+    parameter integer DATA_WIDTH=8,
+    parameter integer ACCUMULATOR_DATA_WIDTH=32
 ) (
     input  wire                                     CLK,
     input  wire                                     ASYNC_RST,
@@ -34,6 +34,7 @@ module Processing_Element #(
         end
         else if (LOAD) begin
             registered_weight <= Input;
+            ToRight           <= Input;
         end
         else if (EN) begin
             PsumOut <= mult_out + PsumIn;

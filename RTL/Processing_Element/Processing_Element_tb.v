@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
 
 module Processing_Element_tb ();
-    localparam int DATA_WIDTH             = 8;
-    localparam int ACCUMULATOR_DATA_WIDTH = 32;
+    localparam integer DATA_WIDTH             = 8;
+    localparam integer ACCUMULATOR_DATA_WIDTH = 32;
     reg                                      CLK;
     reg                                      ASYNC_RST;
     reg                                      SYNC_RST;

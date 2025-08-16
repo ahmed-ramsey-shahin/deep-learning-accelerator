@@ -1,22 +1,21 @@
 `timescale 1ns/1ps
 
 module Matrix_Multiply_Unit_tb();
-    parameter                    WIDTH=8;
-    parameter                    ACCUMULATOR_WIDTH=32;
-    parameter                    LENGTH=3;
-    reg                          CLK;
-    reg                          ASYNC_RST;
-    reg                          SYNC_RST;
-    reg                          EN;
-    reg                          LOAD;
-    reg  [WIDTH-1:0]             Inputs  [0:LENGTH-1];
-    reg  [WIDTH-1:0]             Weights [0:LENGTH-1];
-    wire [ACCUMULATOR_WIDTH-1:0] Result  [0:LENGTH-1];
+    localparam integer                       DATA_WIDTH=8;
+    localparam integer                       ACCUMULATOR_DATA_WIDTH=32;
+    localparam integer                       SA_LENGTH=3;
+    reg                                      CLK;
+    reg                                      ASYNC_RST;
+    reg                                      SYNC_RST;
+    reg                                      EN;
+    reg                                      LOAD;
+    reg  signed [DATA_WIDTH-1:0]             Inputs         [SA_LENGTH];
+    wire signed [ACCUMULATOR_DATA_WIDTH-1:0] Result         [SA_LENGTH];
 
-    reg  [WIDTH-1:0]             MatrixA      [0:LENGTH-1][0:LENGTH-1];
-    reg  [WIDTH-1:0]             MatrixW      [0:LENGTH-1][0:LENGTH-1];
-    reg  [ACCUMULATOR_WIDTH-1:0] ActualResult [0:LENGTH-1][0:LENGTH-1];
-    reg  [ACCUMULATOR_WIDTH-1:0] ExpectedResult [0:LENGTH-1][0:LENGTH-1];
+    reg  signed [DATA_WIDTH-1:0]             MatrixA        [SA_LENGTH][SA_LENGTH];
+    reg  signed [DATA_WIDTH-1:0]             MatrixW        [SA_LENGTH][SA_LENGTH];
+    reg  signed [ACCUMULATOR_DATA_WIDTH-1:0] ActualResult   [SA_LENGTH][SA_LENGTH];
+    reg  signed [ACCUMULATOR_DATA_WIDTH-1:0] ExpectedResult [SA_LENGTH][SA_LENGTH];
 
     always begin
         CLK = 1'b0;
@@ -26,9 +25,9 @@ module Matrix_Multiply_Unit_tb();
     end
 
     Matrix_Multiply_Unit #(
-        .WIDTH(WIDTH),
-        .ACCUMULATOR_WIDTH(ACCUMULATOR_WIDTH),
-        .LENGTH(LENGTH)
+        .DATA_WIDTH(DATA_WIDTH),
+        .ACCUMULATOR_DATA_WIDTH(ACCUMULATOR_DATA_WIDTH),
+        .SA_LENGTH(SA_LENGTH)
     ) DUT (
         .CLK(CLK),
         .ASYNC_RST(ASYNC_RST),
@@ -36,7 +35,6 @@ module Matrix_Multiply_Unit_tb();
         .EN(EN),
         .LOAD(LOAD),
         .Inputs(Inputs),
-        .Weights(Weights),
         .Result(Result)
     );
 
@@ -48,14 +46,15 @@ module Matrix_Multiply_Unit_tb();
         SYNC_RST  = 1'b0;
         EN        = 1'b0;
         LOAD      = 1'b0;
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            Inputs[i]  = {WIDTH{1'b0}};
-            Weights[i]  = {WIDTH{1'b0}};
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            Inputs[i]  = {DATA_WIDTH{1'b0}};
         end
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
-                ActualResult[i][j] = {ACCUMULATOR_WIDTH{1'b0}};
-                ExpectedResult[i][j] = {ACCUMULATOR_WIDTH{1'b0}};
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
+                MatrixA[i][j]        = {DATA_WIDTH{1'b0}};
+                MatrixW[i][j]        = {DATA_WIDTH{1'b0}};
+                ActualResult[i][j]   = {ACCUMULATOR_DATA_WIDTH{1'b0}};
+                ExpectedResult[i][j] = {ACCUMULATOR_DATA_WIDTH{1'b0}};
             end
         end
         #2;
@@ -64,11 +63,11 @@ module Matrix_Multiply_Unit_tb();
     endtask
 
     task static print_small_matrix;
-        input [WIDTH-1:0] Matrix [0:LENGTH-1][0:LENGTH-1];
+        input signed [DATA_WIDTH-1:0] Matrix [SA_LENGTH][SA_LENGTH];
         int i, j;
     begin
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
                 $write("%d ", Matrix[i][j]);
             end
             $display("");
@@ -77,11 +76,11 @@ module Matrix_Multiply_Unit_tb();
     endtask
 
     task static print_large_matrix;
-        input [ACCUMULATOR_WIDTH-1:0] Matrix [0:LENGTH-1][0:LENGTH-1];
+        input signed [ACCUMULATOR_DATA_WIDTH-1:0] Matrix [SA_LENGTH][SA_LENGTH];
         int i, j;
     begin
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
                 $write("%d ", Matrix[i][j]);
             end
             $display("");
@@ -92,10 +91,10 @@ module Matrix_Multiply_Unit_tb();
     // Generate random matrix
     task static generate_random_matrix;
         int i, j;
-        output [WIDTH-1:0] Matrix [0:LENGTH-1][0:LENGTH-1];
+        output signed [DATA_WIDTH-1:0] Matrix [SA_LENGTH][SA_LENGTH];
     begin
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
                 Matrix[i][j]  = $urandom_range(0, 10);
             end
         end
@@ -103,15 +102,15 @@ module Matrix_Multiply_Unit_tb();
     endtask
 
     task static load_weights;
-        input [WIDTH-1:0] Matrix [0:LENGTH-1][0:LENGTH-1];
+        input signed [DATA_WIDTH-1:0] Matrix [SA_LENGTH][SA_LENGTH];
         int i, j;
     begin
-        EN   = 1'b1;
+        EN   = 1'b0;
         LOAD = 1'b1;
         @(negedge CLK);
-        for (i = LENGTH-1; i >= 0; i = i - 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
-                Weights[j] = Matrix[j][i];
+        for (i = SA_LENGTH-1; i >= 0; i = i - 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
+                Inputs[j] = Matrix[j][i];
             end
             @(negedge CLK);
         end
@@ -120,28 +119,27 @@ module Matrix_Multiply_Unit_tb();
     endtask
 
     task static load_inputs;
-        input [WIDTH-1:0] Matrix [0:LENGTH-1][0:LENGTH-1];
+        input signed [DATA_WIDTH-1:0] Matrix [SA_LENGTH][SA_LENGTH];
         int row;
         int col;
         begin
             EN = 1'b1;
-            @(negedge CLK);
-            for (col = 1; col < 2 * LENGTH; col = col + 1) begin
-                for (row = 0; row < LENGTH; row = row + 1) begin
-                    if (col < LENGTH) begin
+            for (col = 1; col < 2 * SA_LENGTH; col = col + 1) begin
+                for (row = 0; row < SA_LENGTH; row = row + 1) begin
+                    if (col < SA_LENGTH) begin
                         if (row < col) begin
                             Inputs[row] = Matrix[row][col - row - 1];
                         end
                         else begin
-                            Inputs[row] = {WIDTH{1'b0}};
+                            Inputs[row] = {DATA_WIDTH{1'b0}};
                         end
                     end
-                    else if (col == LENGTH) begin
+                    else if (col == SA_LENGTH) begin
                         Inputs[row]  = Matrix[row][col-row-1];
                     end
-                    else if (col > LENGTH) begin
-                        if (row < col - LENGTH) begin
-                            Inputs[row] = {WIDTH{1'b0}};
+                    else if (col > SA_LENGTH) begin
+                        if (row < col - SA_LENGTH) begin
+                            Inputs[row] = {DATA_WIDTH{1'b0}};
                         end
                         else begin
                             Inputs[row] = Matrix[row][col - row - 1];
@@ -150,20 +148,19 @@ module Matrix_Multiply_Unit_tb();
                 end
                 @(negedge CLK);
             end
-            for (row = 0; row < LENGTH; row = row + 1) begin
-                Inputs[row] = {WIDTH{1'b0}};
+            for (row = 0; row < SA_LENGTH; row = row + 1) begin
+                Inputs[row] = {DATA_WIDTH{1'b0}};
             end
         end
     endtask
 
     task static collect_outputs;
         int x, y;
-        output [ACCUMULATOR_WIDTH-1:0] ActualOutput [0:LENGTH-1][0:LENGTH-1];
+        output signed [ACCUMULATOR_DATA_WIDTH-1:0] ActualOutput [SA_LENGTH][SA_LENGTH];
     begin
-        @(negedge CLK);
-        for (x = 0; x < 2 * LENGTH - 1; x = x + 1) begin
-            for (y = 0; y < LENGTH; y = y + 1) begin
-                if (x >= y && x < y + LENGTH) begin
+        for (x = 0; x < 2 * SA_LENGTH - 1; x = x + 1) begin
+            for (y = 0; y < SA_LENGTH; y = y + 1) begin
+                if (x >= y && x < y + SA_LENGTH) begin
                     ActualOutput[y][x-y] = Result[y];
                 end
             end
@@ -173,20 +170,20 @@ module Matrix_Multiply_Unit_tb();
     endtask
 
     task static calculate_expected_result;
-        input  [WIDTH-1:0] Matrix1 [0:LENGTH-1][0:LENGTH-1];
-        input  [WIDTH-1:0] Matrix2 [0:LENGTH-1][0:LENGTH-1];
-        output [ACCUMULATOR_WIDTH-1:0] Result [0:LENGTH-1][0:LENGTH-1];
+        input  signed [DATA_WIDTH-1:0] Matrix1 [SA_LENGTH][SA_LENGTH];
+        input  signed [DATA_WIDTH-1:0] Matrix2 [SA_LENGTH][SA_LENGTH];
+        output signed [ACCUMULATOR_DATA_WIDTH-1:0] Result [SA_LENGTH][SA_LENGTH];
         int i, j, k;
     begin
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
-                Result[i][j] = {ACCUMULATOR_WIDTH{1'b0}};
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
+                Result[i][j] = {ACCUMULATOR_DATA_WIDTH{1'b0}};
             end
         end
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
-                for (k = 0; k < LENGTH; k = k + 1) begin
-                    Result[i][j] = Result[i][j] + (Matrix1[i][k] * Matrix2[k][j]);
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
+                for (k = 0; k < SA_LENGTH; k = k + 1) begin
+                    Result[i][j] = Result[i][j] + (Matrix1[k][i] * Matrix2[k][j]);
                 end
             end
         end
@@ -194,15 +191,15 @@ module Matrix_Multiply_Unit_tb();
     endtask
 
     task static validate_results;
-        input [ACCUMULATOR_WIDTH-1:0] Expected [0:LENGTH-1][0:LENGTH-1];
-        input [ACCUMULATOR_WIDTH-1:0] Actual [0:LENGTH-1][0:LENGTH-1];
+        input signed [ACCUMULATOR_DATA_WIDTH-1:0] Expected [SA_LENGTH][SA_LENGTH];
+        input signed [ACCUMULATOR_DATA_WIDTH-1:0] Actual [SA_LENGTH][SA_LENGTH];
         input int test_case_number;
         reg test_case_passed;
         int i, j;
     begin
         test_case_passed = 1'b1;
-        for (i = 0; i < LENGTH; i = i + 1) begin
-            for (j = 0; j < LENGTH; j = j + 1) begin
+        for (i = 0; i < SA_LENGTH; i = i + 1) begin
+            for (j = 0; j < SA_LENGTH; j = j + 1) begin
                 if (Expected[i][j] != Actual[i][j]) begin
                     test_case_passed = 1'b0;
                     $display(
@@ -240,10 +237,11 @@ module Matrix_Multiply_Unit_tb();
     end
 
     initial begin
-        repeat(2 * LENGTH + 1) @(negedge CLK);
+        repeat(2 * SA_LENGTH + 1) @(negedge CLK);
         collect_outputs(ActualResult);
         validate_results(ExpectedResult, ActualResult, 1);
-        @(negedge CLK) $stop;
+        @(negedge CLK);
+        $stop;
     end
 endmodule
 
