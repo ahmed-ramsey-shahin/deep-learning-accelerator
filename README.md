@@ -46,12 +46,6 @@ The accelerator consists of the following key components:
 
 ```
 ├── RTL/
-│   ├── Accumulators/
-│   │   ├── Accumulators.sv           # Accumulator module for sum storage
-│   │   ├── Accumulators_tb.sv        # Testbench for accumulator
-│   │   ├── restart.do                # ModelSim restart script
-│   │   ├── run.do                    # ModelSim simulation script
-│   │   └── wave.do                   # ModelSim waveform configuration
 │   ├── Activations/
 │   │   ├── ReLU/                     # ReLU activation function
 │   │   ├── Sigmoid/                  # Sigmoid activation function
@@ -218,40 +212,6 @@ High-performance 8x8 bit multiplier using Wallace tree architecture for fast par
 **Components:**
 - Half Adders (HA): For 2-input addition without carry-in
 - Full Adders (FA): For 3-input addition with carry propagation
-
-### Accumulators
-Vector accumulation module for storing and managing partial sums.
-
-**Parameters:**
-- VECTOR_WIDTH: Width of input/output vectors (default: 256)
-- NO_VECTORS: Number of vectors to store (default: 4096)
-- DATA_WIDTH: Bit width of each data element (default: 32)
-- VECTOR_SELECTOR_WIDTH: Bit width of vector selection signals (default: 12)
-
-**Inputs:**
-- CLK: Clock signal
-- ASYNC_RST: Asynchronous reset (active low)
-- SYNC_RST: Synchronous reset (active high)
-- EN: Enable signal for accumulator operation
-- Inputs[DATA_WIDTH-1:0][0:VECTOR_WIDTH-1]: Input vector data
-- InputVectorSelector[VECTOR_SELECTOR_WIDTH-1:0]: Selector for input vector storage
-- OutputVectorSelector[VECTOR_SELECTOR_WIDTH-1:0]: Selector for output vector retrieval
-
-**Outputs:**
-- Result[DATA_WIDTH-1:0][0:VECTOR_WIDTH-1]: Selected output vector
-
-**Functionality:**
-- Manages multiple vector storage and retrieval
-- Supports parallel vector operations
-- Implements synchronous vector loading
-- Provides flexible vector selection mechanism
-- Maintains independent input and output vector selection
-- Supports asynchronous and synchronous reset
-
-**Files:**
-- wallace_tree_multiplier_8x8.v: Main implementation
-- FA.v: Full adder component
-- HA.v: Half adder component
 
 ## Implementation Flow
 
