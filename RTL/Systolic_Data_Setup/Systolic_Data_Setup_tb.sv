@@ -1,19 +1,19 @@
 `timescale 1ns/1ps
 
 module Systolic_Data_Setup_tb();
-    localparam       DATA_WIDTH=8;
-    localparam       SA_LENGTH=5;
-    reg              CLK;
-    reg              ASYNC_RST;
-    reg              SYNC_RST;
-    reg              EN;
-    reg  [DATA_WIDTH-1:0] Inputs  [0:SA_LENGTH-1];
-    wire [DATA_WIDTH-1:0] Outputs [0:SA_LENGTH-1];
+    localparam integer    DATA_WIDTH=8;
+    localparam integer    SA_LENGTH=5;
+    reg                   CLK;
+    reg                   ASYNC_RST;
+    reg                   SYNC_RST;
+    reg                   EN;
+    reg  [DATA_WIDTH-1:0] Inputs  [SA_LENGTH];
+    wire [DATA_WIDTH-1:0] Outputs [SA_LENGTH];
     int i;
     int j;
 
     Systolic_Data_Setup #(
-        .DATA_WIDTH(WIDTH),
+        .DATA_WIDTH(DATA_WIDTH),
         .SA_LENGTH(SA_LENGTH)
     ) DUT (
         .CLK(CLK),
