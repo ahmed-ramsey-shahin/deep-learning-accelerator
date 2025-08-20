@@ -1,3 +1,5 @@
+`timescale 1ns/1ps
+
 module VMax_Calculator_tb();
     localparam integer DATA_WIDTH=32;
     localparam integer SA_LENGTH=10;
