@@ -1,7 +1,7 @@
 module Carry_Save_Multiplier #(parameter WIDTH=8) (
-    input  wire [WIDTH-1:0]   A,
-    input  wire [WIDTH-1:0]   B,
-    output wire [2*WIDTH-1:0] P
+    input  signed wire [WIDTH-1:0]   A,
+    input  signed wire [WIDTH-1:0]   B,
+    output signed wire [2*WIDTH-1:0] P
 );
     wire [WIDTH+1:0] sum   [WIDTH:0];
     wire [WIDTH+1:0] carry [WIDTH:0];

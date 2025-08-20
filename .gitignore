@@ -24,7 +24,7 @@
 /RTL/Activations/Tanh/work/*
 /RTL/Systolic_Data_Setup/work/*
 /RTL/deep*
-*.do
+# *.do
 *transcript
 node_modules/*
 *.json
