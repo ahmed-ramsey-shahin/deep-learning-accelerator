@@ -1,38 +1,44 @@
 module Sigmoid_tb ();
-    reg signed [23:0] in;
-    wire signed [7:0] out;
+    parameter IN_WIDTH = 15;
+    parameter OUT_WIDTH = 11;
+    reg signed [IN_WIDTH-1:0] in;
+    reg en;
+    wire signed [OUT_WIDTH-1:0] out;
 
-    reg signed [23:0] test_inputs [0:9] = '{
+    reg signed [IN_WIDTH-1:0] test_inputs [0:10] = '{
         0,
         5,
         300,
-        600,
-        1500,
+        1600,
+        2433,
+        8000,
         -5,
         -300,
-        -608,
-        -1500,
-        -8388608
+        -1600,
+        -2433,
+        -8000
     };
     
-    reg [7:0] expected_outputs [0:9] = '{
-        64,         // 0
-        65,         // 5
-        117,        // 300
-        126,        // 600
-        127,        // 1500
-        62,         // -5
-        10,         // -300
-        0,          // -600
-        0,          // -1500
-        0           // -8388608
+    reg [OUT_WIDTH-1:0] expected_outputs [0:10] = '{
+        511,        // 0
+        512,        // 5
+        586,        // 300
+        839,        // 1600
+        939,        // 2433
+        1023,       // 8000
+        511,        // -5
+        437,        // -300
+        184,        // -1600
+        84,         // -2433
+        0           // -8000
     };
 
-    Sigmoid dut (in, out);
+    Sigmoid #(.IN_WIDTH(IN_WIDTH), .OUT_WIDTH(OUT_WIDTH)) dut (.in(in), .en(en), .out(out));
 
     integer i;
     initial begin
-        for (i = 0; i < 10; i = i + 1) begin
+        en = 1;
+        for (i = 0; i < 11; i = i + 1) begin
             in = test_inputs[i];
             #10; // Wait for propagation
             
@@ -41,5 +47,16 @@ module Sigmoid_tb ();
                 $display("Error [Test %0d]: Input = %0d, Expected = %0d, Got = %0d", i, in, expected_outputs[i], out);
             end
         end
+
+        en = 0;
+        in = 5;
+        #10;
+
+        in = 15;
+        #10;
+
+        en = 1;
+        in = 0;
+        #10;
     end
 endmodule
