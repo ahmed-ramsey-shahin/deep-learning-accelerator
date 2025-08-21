@@ -1,12 +1,19 @@
-module ReLU (in, out);    
-    input signed [23:0] in;
-    output reg signed [7:0] out;
+module ReLU (in, en, out);
+    parameter IN_WIDTH = 8;
+    parameter OUT_WIDTH = 8;
+    input signed [IN_WIDTH-1:0] in;
+    input en;
+    output reg signed [OUT_WIDTH-1:0] out;
 
     always @(*) begin
-        if (in[23] == 1'b1) begin
-            out = 0;
+        if (en) begin
+            if (in[OUT_WIDTH-1] == 1'b1) begin
+                out = 0;
+            end else begin
+                out = in;
+            end
         end else begin
-            out = (in >> 16);
+            out = 0;
         end
     end
 
