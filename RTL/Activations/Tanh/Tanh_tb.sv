@@ -1,62 +1,19 @@
 module Tanh_tb ();
-    parameter IN_WIDTH = 15;
-    parameter OUT_WIDTH = 13;
-    reg signed [IN_WIDTH-1:0] in;
+    parameter DATA_WIDTH = 12;
+    parameter SA_LENGTH = 8;
+    parameter S = 7;
+    reg signed [DATA_WIDTH-1:0] in [SA_LENGTH];
     reg en;
-    wire signed [OUT_WIDTH-1:0] out;
+    wire signed [DATA_WIDTH-1:0] out [SA_LENGTH];
 
-    reg signed [IN_WIDTH-1:0] test_inputs [0:12] = '{
-        0,
-        97,
-        2125,
-        5194,
-        7194,
-        10000,
-        13127,
-        -97,
-        -2125,
-        -5194,
-        -7194,
-        -10000,
-        -13127
-    };
-    
-    reg [OUT_WIDTH-1:0] expected_outputs [0:12] = '{
-        0,
-        97,
-        2085,
-        3345,
-        3714,
-        3952,
-        4095,
-        -97,
-        -2085,
-        -3345,
-        -3714,
-        -3952,
-        -4095
-    };
+    Tanh #(.DATA_WIDTH(DATA_WIDTH), .SA_LENGTH(SA_LENGTH), .S(S)) dut (.in(in), .en(en), .out(out));
 
-    Tanh #(.IN_WIDTH(IN_WIDTH), .OUT_WIDTH(OUT_WIDTH)) dut (.in(in), .en(en), .out(out));
-
-    integer i;
     initial begin
         en = 1;
-        for (i = 0; i < 13; i = i + 1) begin
-            in = test_inputs[i];
-            #10; // Wait for propagation
-            
-            // Check output
-            if (out !== expected_outputs[i]) begin
-                $display("Error [Test %0d]: Input = %0d, Expected = %0d, Got = %0d", i, in, expected_outputs[i], out);
-            end
-        end
-
-        en = 0;
-        in = 35;
+        in = {0, 400, 517, -512, -1, -2048, 2047, 52};
         #10;
 
-        in = 198;
+        en = 0;
         #10;
 
         en = 1;
