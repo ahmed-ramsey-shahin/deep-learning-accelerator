@@ -4,26 +4,25 @@ module Unified_Buffer_tb ();
     localparam integer DATA_WIDTH=8;
     localparam integer NUM_BANKS=16;
     localparam integer BANK_DEPTH=16;
-    localparam integer BANK_BITS  = $clog2(NUM_BANKS);
     localparam integer ROW_BITS   = $clog2(BANK_DEPTH);
-    localparam integer ADDR_WIDTH = BANK_BITS + ROW_BITS;
+    integer bank;
 
     reg                          CLK;
     reg                          ASYNC_RST;
     reg                          SYNC_RST;
     reg                          EN;
-    reg                          ActivationReadValid;
-    reg                          WeightReadValid;
-    reg                          DmaWriteValid;
-    reg                          WbWriteValid;
-    reg         [ADDR_WIDTH-1:0] ActivationReadAddress;
-    reg         [ADDR_WIDTH-1:0] WeightReadAddress;
-    reg         [ADDR_WIDTH-1:0] DmaWriteAddress;
-    reg         [ADDR_WIDTH-1:0] WbWriteAddress;
-    reg  signed [DATA_WIDTH-1:0] DmaWriteData;
-    reg  signed [DATA_WIDTH-1:0] WbWriteData;
-    wire signed [DATA_WIDTH-1:0] ActivationReadData;
-    wire signed [DATA_WIDTH-1:0] WeightReadData;
+    reg                          PortOneReadValid    [NUM_BANKS];
+    reg                          PortTwoReadValid    [NUM_BANKS];
+    reg                          PortOneWriteValid   [NUM_BANKS];
+    reg                          PortTwoWriteValid   [NUM_BANKS];
+    reg         [ROW_BITS-1:0]   PortOneReadAddress  [NUM_BANKS];
+    reg         [ROW_BITS-1:0]   PortTwoReadAddress  [NUM_BANKS];
+    reg         [ROW_BITS-1:0]   PortOneWriteAddress [NUM_BANKS];
+    reg         [ROW_BITS-1:0]   PortTwoWriteAddress [NUM_BANKS];
+    reg  signed [DATA_WIDTH-1:0] PortOneWriteData    [NUM_BANKS];
+    reg  signed [DATA_WIDTH-1:0] PortTwoWriteData    [NUM_BANKS];
+    wire signed [DATA_WIDTH-1:0] PortOneReadData     [NUM_BANKS];
+    wire signed [DATA_WIDTH-1:0] PortTwoReadData     [NUM_BANKS];
 
     always begin
         CLK = 1'b0;
@@ -41,63 +40,65 @@ module Unified_Buffer_tb ();
         .ASYNC_RST(ASYNC_RST),
         .SYNC_RST(SYNC_RST),
         .EN(EN),
-        .ActivationReadValid(ActivationReadValid),
-        .WeightReadValid(WeightReadValid),
-        .DmaWriteValid(DmaWriteValid),
-        .WbWriteValid(WbWriteValid),
-        .ActivationReadAddress(ActivationReadAddress),
-        .WeightReadAddress(WeightReadAddress),
-        .DmaWriteAddress(DmaWriteAddress),
-        .WbWriteAddress(WbWriteAddress),
-        .DmaWriteData(DmaWriteData),
-        .WbWriteData(WbWriteData),
-        .ActivationReadData(ActivationReadData),
-        .WeightReadData(WeightReadData)
+        .PortOneWriteData(PortOneWriteData),
+        .PortOneWriteAddress(PortOneWriteAddress),
+        .PortOneWriteValid(PortOneWriteValid),
+        .PortOneReadAddress(PortOneReadAddress),
+        .PortOneReadData(PortOneReadData),
+        .PortOneReadValid(PortOneReadValid),
+        .PortTwoWriteData(PortTwoWriteData),
+        .PortTwoWriteAddress(PortTwoWriteAddress),
+        .PortTwoWriteValid(PortTwoWriteValid),
+        .PortTwoReadAddress(PortTwoReadAddress),
+        .PortTwoReadData(PortTwoReadData),
+        .PortTwoReadValid(PortTwoReadValid)
     );
 
     initial begin
+        // reset
         ASYNC_RST = 1'b0;
         SYNC_RST  = 1'b0;
         EN        = 1'b1;
-        ActivationReadValid   = 1'b0;
-        WeightReadValid       = 1'b0;
-        DmaWriteValid         = 1'b0;
-        WbWriteValid          = 1'b0;
-        ActivationReadAddress = 'b0;
-        WeightReadAddress     = 'b0;
-        DmaWriteAddress       = 'b0;
-        WbWriteAddress        = 'b0;
-        DmaWriteData          = 'b0;
-        WbWriteData           = 'b0;
+        for (bank = 0; bank < NUM_BANKS; bank++) begin
+            PortOneWriteValid[bank]   = 1'b0;
+            PortOneWriteAddress[bank] = 1'b0;
+            PortOneWriteData[bank]    = 1'b0;
+            PortTwoWriteValid[bank]   = 1'b0;
+            PortTwoWriteAddress[bank] = 1'b0;
+            PortTwoWriteData[bank]    = 1'b0;
+            PortOneReadValid[bank]    = 1'b0;
+            PortOneReadAddress[bank]  = 1'b0;
+            PortTwoReadValid[bank]    = 1'b0;
+            PortTwoReadAddress[bank]  = 1'b0;
+        end
         #2;
-        ASYNC_RST             = 1'b1;
+        ASYNC_RST = 1'b1;
+        // test case 1
         @(negedge CLK);
-        DmaWriteValid         = 1'b1;
-        DmaWriteAddress       = 'b0010_0101;
-        DmaWriteData          = 'd120;
+        PortOneWriteValid[5]   = 1'b1;
+        PortOneWriteData[5]    = 'd120;
+        PortOneWriteAddress[5] = 'b0010;
+        // test case 2
         @(negedge CLK);
-        DmaWriteValid         = 1'b0;
-        WbWriteValid          = 1'b1;
-        WbWriteAddress        = 'b1001_0011;
-        WbWriteData           = 'd101;
+        PortOneWriteValid[5]   = 1'b0;
+        PortTwoWriteValid[3]   = 1'b1;
+        PortTwoWriteData[3]    = 'd101;
+        PortTwoWriteAddress[3] = 'b1001;
+        // test case 3
         @(negedge CLK);
-        DmaWriteValid         = 1'b1;
-        WbWriteAddress        = 'b1010_0011;
-        WbWriteData           = 'd95;
-        DmaWriteAddress       = 'b0010_0011;
-        DmaWriteData          = 'd120;
+        PortOneWriteValid[3]   = 1'b1;
+        PortOneWriteData[3]    = 'd120;
+        PortOneWriteAddress[3] = 'b0010;
+        PortTwoWriteAddress[3] = 'b1010;
+        PortTwoWriteData[3]    = 'd95;
+        // test case 4
         @(negedge CLK);
-        WbWriteAddress        = 'b0001_0011;
-        WbWriteData           = 'd101;
-        DmaWriteAddress       = 'b0010_0100;
-        DmaWriteData          = 'd120;
-        @(negedge CLK);
-        DmaWriteValid         = 1'b0;
-        WbWriteValid          = 1'b0;
-        WeightReadValid       = 1'b1;
-        ActivationReadValid   = 1'b1;
-        WeightReadAddress     = 'b1001_0011;
-        ActivationReadAddress = 'b1010_0011;
+        PortOneWriteValid[3]   = 1'b0;
+        PortTwoWriteValid[3]   = 1'b0;
+        PortOneReadValid[3]    = 1'b1;
+        PortTwoReadValid[5]    = 1'b1;
+        PortOneReadAddress[3]  = 'b1010;
+        PortTwoReadAddress[5]  = 'b0010;
         @(negedge CLK);
         $stop;
     end
