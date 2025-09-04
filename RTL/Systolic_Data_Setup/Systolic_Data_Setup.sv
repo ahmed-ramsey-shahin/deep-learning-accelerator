@@ -6,8 +6,8 @@ module Systolic_Data_Setup #(
     input  wire             ASYNC_RST,
     input  wire             SYNC_RST,
     input  wire             EN,
-    input  wire [DATA_WIDTH-1:0] Inputs  [SA_LENGTH],
-    output wire [DATA_WIDTH-1:0] Outputs [SA_LENGTH]
+    input  wire signed [DATA_WIDTH-1:0] Inputs  [SA_LENGTH],
+    output wire signed [DATA_WIDTH-1:0] Outputs [SA_LENGTH]
 );
     genvar row;
     genvar col;

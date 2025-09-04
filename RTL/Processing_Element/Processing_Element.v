@@ -32,13 +32,15 @@ module Processing_Element #(
             ToRight           <= 'd0;
             PsumOut           <= 'd0;
         end
-        else if (LOAD) begin
-            registered_weight <= Input;
-            ToRight           <= Input;
-        end
         else if (EN) begin
-            PsumOut <= mult_out + PsumIn;
-            ToRight <= Input;
+            if (LOAD) begin
+                registered_weight <= Input;
+                ToRight           <= Input;
+            end
+            else begin
+                PsumOut <= mult_out + PsumIn;
+                ToRight <= Input;
+            end
         end
     end
 endmodule
