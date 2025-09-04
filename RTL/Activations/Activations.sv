@@ -1,9 +1,9 @@
-module Activations (in, clk, en, sel, out);
+module Activations (in, clk, en, sync_rst, async_rst, sel, out);
     parameter DATA_WIDTH = 11;
     parameter SA_LENGTH = 256;
     parameter S = 7;
     input signed [DATA_WIDTH-1:0] in [SA_LENGTH];
-    input clk, en;
+    input clk, en, sync_rst, async_rst;
     input [1:0] sel;
     output reg signed [DATA_WIDTH-1:0] out [SA_LENGTH];
 
@@ -44,18 +44,22 @@ module Activations (in, clk, en, sel, out);
     Tanh #(.DATA_WIDTH(DATA_WIDTH), .SA_LENGTH(SA_LENGTH), .S(S)) tanh (.in(in), .en(tanh_en), .out(tanh_out));
 
     integer i;
-    always @(posedge clk) begin
-        if (en) begin
+    always @(posedge clk or negedge async_rst) begin
+        if (~async_rst) begin
+            for (i = 0; i < SA_LENGTH; i = i + 1) begin
+                out[i] <= 0;
+            end
+        end else if(sync_rst) begin
+            for (i = 0; i < SA_LENGTH; i = i + 1) begin
+                out[i] <= 0;
+            end
+        end else if(en) begin
             case (sel)
                 2'b00: out <= relu_out;
                 2'b01: out <= sigmoid_out;
                 2'b10: out <= tanh_out;
                 2'b11: out <= in;
             endcase
-        end else begin
-            for (i = 0; i < SA_LENGTH; i = i + 1) begin
-                out[i] <= 0;
-            end
         end
     end
 endmodule
