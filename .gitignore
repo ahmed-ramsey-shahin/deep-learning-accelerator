@@ -12,6 +12,7 @@
 *_info
 *_vmake
 *.txt
+*.py
 /RTL/Multipliers/Carry_Save_Multiplier/work/*
 /RTL/Multipliers/Wallace_Tree_Multiplier/work/*
 /RTL/Processing_Element/work/*
@@ -30,3 +31,4 @@ node_modules/*
 *.json
 *.wcfg
 testing.sv
+/RTL/work/*

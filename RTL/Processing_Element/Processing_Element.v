@@ -12,14 +12,7 @@ module Processing_Element #(
     output reg  signed [DATA_WIDTH-1:0]             ToRight,
     output reg  signed [ACCUMULATOR_DATA_WIDTH-1:0] PsumOut
 );
-    wire signed [2*DATA_WIDTH-1:0] mult_out;
     reg  signed [DATA_WIDTH-1:0]   registered_weight;
-
-    Carry_Save_Multiplier #(DATA_WIDTH) mult (
-        .A(Input),
-        .B(registered_weight),
-        .P(mult_out)
-    );
 
     always @(posedge CLK or negedge ASYNC_RST) begin
         if (~ASYNC_RST) begin
@@ -38,7 +31,7 @@ module Processing_Element #(
                 ToRight           <= Input;
             end
             else begin
-                PsumOut <= mult_out + PsumIn;
+                PsumOut <= (Input * registered_weight) + PsumIn;
                 ToRight <= Input;
             end
         end
