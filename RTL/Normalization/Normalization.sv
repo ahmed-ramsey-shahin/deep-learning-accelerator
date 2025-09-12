@@ -4,6 +4,7 @@ module Normalization #(
     parameter integer SA_LENGTH=256
 ) (
     input  wire signed [7:0]           ShiftAmmount,
+    input  wire signed [OUT_WIDTH-1:0] Z,
     input  wire signed [IN_WIDTH-1:0]  In  [SA_LENGTH],
     output reg  signed [OUT_WIDTH-1:0] Out [SA_LENGTH]
 );
@@ -21,6 +22,8 @@ module Normalization #(
             else begin
                 shifted_value = In[i] >>> (-ShiftAmmount);
             end
+
+            shifted_value = shifted_value + Z;
 
             if (shifted_value > MAX_VALUE) begin
                 Out[i] = MAX_VALUE[OUT_WIDTH-1:0];
