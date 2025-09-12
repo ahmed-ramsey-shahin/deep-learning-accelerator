@@ -37,7 +37,7 @@ module Matrix_Multiply_Unit #(
                         .EN(EN),
                         .LOAD(LOAD),
                         .Input(Inputs[row]),
-                        .PsumIn('b0),
+                        .PsumIn({ACCUMULATOR_DATA_WIDTH{1'b0}}),
                         .ToRight(ToRight[row][col]),
                         .PsumOut(Psum[row][col])
                     );
@@ -53,7 +53,7 @@ module Matrix_Multiply_Unit #(
                         .EN(EN),
                         .LOAD(LOAD),
                         .Input(ToRight[row][col-1]),
-                        .PsumIn('b0),
+                        .PsumIn({ACCUMULATOR_DATA_WIDTH{1'b0}}),
                         .ToRight(ToRight[row][col]),
                         .PsumOut(Psum[row][col])
                     );

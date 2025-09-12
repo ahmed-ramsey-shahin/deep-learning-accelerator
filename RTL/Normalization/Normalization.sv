@@ -3,7 +3,7 @@ module Normalization #(
     parameter integer OUT_WIDTH=8,
     parameter integer SA_LENGTH=256
 ) (
-    input  wire        [7:0]           ShiftAmmount,
+    input  wire signed [7:0]           ShiftAmmount,
     input  wire signed [IN_WIDTH-1:0]  In  [SA_LENGTH],
     output reg  signed [OUT_WIDTH-1:0] Out [SA_LENGTH]
 );
@@ -15,7 +15,12 @@ module Normalization #(
 
     always_comb begin
         for (i = 0; i < SA_LENGTH; i = i + 1) begin
-            shifted_value = In[i] >>> ShiftAmmount;
+            if (ShiftAmmount > 0) begin
+                shifted_value = In[i] <<< ShiftAmmount;
+            end
+            else begin
+                shifted_value = In[i] >>> (-ShiftAmmount);
+            end
 
             if (shifted_value > MAX_VALUE) begin
                 Out[i] = MAX_VALUE[OUT_WIDTH-1:0];
