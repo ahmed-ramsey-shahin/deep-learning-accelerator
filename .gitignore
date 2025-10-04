@@ -13,17 +13,6 @@
 *_vmake
 *.txt
 *.py
-/RTL/Multipliers/Carry_Save_Multiplier/work/*
-/RTL/Multipliers/Wallace_Tree_Multiplier/work/*
-/RTL/Processing_Element/work/*
-/RTL/Matrix_Multiply_Unit/work/*
-/RTL/Accumulators/work/*
-/RTL/Activations/work/*
-/RTL/Activations/ReLU/work/*
-/RTL/Activations/Sigmoid/work/*
-/RTL/Activations/Softmax/work/*
-/RTL/Activations/Tanh/work/*
-/RTL/Systolic_Data_Setup/work/*
 /RTL/deep*
 *.do
 *transcript
@@ -31,4 +20,6 @@ node_modules/*
 *.json
 *.wcfg
 testing.sv
-/RTL/work/*
+**/work/
+*.list
+*.ucdb

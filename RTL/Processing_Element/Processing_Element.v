@@ -32,14 +32,14 @@ module Processing_Element #(
             InputToRight      <= 'd0;
             PsumOut           <= 'd0;
         end
-        else if (SYNC_RST) begin
-            registered_weight <= 'd0;
-            WeightToRight     <= 'd0;
-            InputToRight      <= 'd0;
-            PsumOut           <= 'd0;
-        end
         else if (EN) begin
-            if (LOAD) begin
+            if (SYNC_RST) begin
+                registered_weight <= 'd0;
+                WeightToRight     <= 'd0;
+                InputToRight      <= 'd0;
+                PsumOut           <= 'd0;
+            end
+            else if (LOAD) begin
                 registered_weight <= Input;
                 WeightToRight     <= Input;
             end

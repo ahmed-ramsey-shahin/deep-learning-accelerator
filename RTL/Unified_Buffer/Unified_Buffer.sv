@@ -32,22 +32,24 @@ module Unified_Buffer #(
                     PortOneReadData[bank] <= 'd0;
                     PortTwoReadData[bank] <= 'd0;
                 end
-                else if (SYNC_RST) begin
-                    PortOneReadData[bank] <= 'd0;
-                    PortTwoReadData[bank] <= 'd0;
-                end
                 else if (EN) begin
-                    if (PortOneReadValid[bank]) begin
-                        PortOneReadData[bank] <= mem[PortOneReadAddress[bank]];
+                    if (SYNC_RST) begin
+                        PortOneReadData[bank] <= 'd0;
+                        PortTwoReadData[bank] <= 'd0;
                     end
-                    if (PortTwoReadValid[bank]) begin
-                        PortTwoReadData[bank] <= mem[PortTwoReadAddress[bank]];
+                    else begin
+                        if (PortOneReadValid[bank]) begin
+                            PortOneReadData[bank] <= mem[PortOneReadAddress[bank]];
+                        end
+                        if (PortTwoReadValid[bank]) begin
+                            PortTwoReadData[bank] <= mem[PortTwoReadAddress[bank]];
+                        end
                     end
                 end
             end
 
             // Write block
-            always @(posedge CLK or negedge ASYNC_RST) begin
+            always @(posedge CLK) begin
                 if (EN) begin
                     if (PortOneWriteValid[bank]) begin
                         mem[PortOneWriteAddress[bank]] <= PortOneWriteData[bank];

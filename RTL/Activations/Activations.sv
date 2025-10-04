@@ -49,17 +49,19 @@ module Activations (in, clk, en, sync_rst, async_rst, sel, out);
             for (i = 0; i < SA_LENGTH; i = i + 1) begin
                 out[i] <= 0;
             end
-        end else if(sync_rst) begin
-            for (i = 0; i < SA_LENGTH; i = i + 1) begin
-                out[i] <= 0;
-            end
         end else if(en) begin
-            case (sel)
-                2'b00: out <= relu_out;
-                2'b01: out <= sigmoid_out;
-                2'b10: out <= tanh_out;
-                2'b11: out <= in;
-            endcase
+            if(sync_rst) begin
+                for (i = 0; i < SA_LENGTH; i = i + 1) begin
+                    out[i] <= 0;
+                end
+            end else begin
+                case (sel)
+                    2'b00: out <= relu_out;
+                    2'b01: out <= sigmoid_out;
+                    2'b10: out <= tanh_out;
+                    2'b11: out <= in;
+                endcase
+            end
         end
     end
 endmodule

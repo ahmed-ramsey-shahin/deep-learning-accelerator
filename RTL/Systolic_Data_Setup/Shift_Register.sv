@@ -16,11 +16,13 @@ module Shift_Register #(
         if (~ASYNC_RST) begin
             regs[0] <= 'd0;
         end
-        else if (SYNC_RST) begin
-            regs[0] <= 'd0;
-        end
         else if (EN) begin
-            regs[0] <= In;
+            if (SYNC_RST) begin
+                regs[0] <= 'd0;
+            end
+            else begin
+                regs[0] <= In;
+            end
         end
     end
 
@@ -30,11 +32,13 @@ module Shift_Register #(
                 if (~ASYNC_RST) begin
                     regs[i] <= 'd0;
                 end
-                else if (SYNC_RST) begin
-                    regs[i] <= 'd0;
-                end
                 else if (EN) begin
-                    regs[i] <= regs[i-1];
+                    if (SYNC_RST) begin
+                        regs[i] <= 'd0;
+                    end
+                    else begin
+                        regs[i] <= regs[i-1];
+                    end
                 end
             end
         end

@@ -15,11 +15,13 @@ module Counter #(
         if (~ASYNC_RST) begin
             Value <= 'd0;
         end
-        else if (SYNC_RST) begin
-            Value <= 'd0;
-        end
         else if (EN) begin
-            Value <= new_value;
+            if (SYNC_RST) begin
+                Value <= 'd0;
+            end
+            else begin
+                Value <= new_value;
+            end
         end
     end
 
