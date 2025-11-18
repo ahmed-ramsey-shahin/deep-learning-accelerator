@@ -4,7 +4,7 @@ module Normalization #(
     parameter integer SA_LENGTH=256
 ) (
     input  wire signed [7:0]           ShiftAmmount,
-    input  wire signed [OUT_WIDTH-1:0] Z,
+    input  wire signed [7:0]           Z,
     input  wire signed [IN_WIDTH-1:0]  In  [SA_LENGTH],
     output reg  signed [OUT_WIDTH-1:0] Out [SA_LENGTH]
 );

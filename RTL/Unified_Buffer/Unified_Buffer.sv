@@ -1,65 +1,63 @@
 module Unified_Buffer #(
-    parameter integer DATA_WIDTH=8,
-    parameter integer NUM_BANKS=16,
-    parameter integer BANK_DEPTH=4096,
-    localparam integer ROW_BITS   = $clog2(BANK_DEPTH)
+    parameter  integer SA_LENGTH=256,
+    parameter  integer ADDR_WIDTH=10,
+    parameter  integer NO_BANKS=8,
+    localparam integer DataWidth=8*SA_LENGTH,
+    localparam integer BytesPerWord=DataWidth/8,
+    localparam integer AddrWidth=ADDR_WIDTH+$clog2(NO_BANKS)+$clog2(BytesPerWord)
 ) (
-    input  wire                         CLK,
-    input  wire                         ASYNC_RST,
-    input  wire                         SYNC_RST,
-    input  wire                         EN,
-    input  wire                         PortOneReadValid    [NUM_BANKS],
-    input  wire                         PortTwoReadValid    [NUM_BANKS],
-    input  wire                         PortOneWriteValid   [NUM_BANKS],
-    input  wire                         PortTwoWriteValid   [NUM_BANKS],
-    input  wire        [ROW_BITS-1:0]   PortOneReadAddress  [NUM_BANKS],
-    input  wire        [ROW_BITS-1:0]   PortTwoReadAddress  [NUM_BANKS],
-    input  wire        [ROW_BITS-1:0]   PortOneWriteAddress [NUM_BANKS],
-    input  wire        [ROW_BITS-1:0]   PortTwoWriteAddress [NUM_BANKS],
-    input  wire signed [DATA_WIDTH-1:0] PortOneWriteData    [NUM_BANKS],
-    input  wire signed [DATA_WIDTH-1:0] PortTwoWriteData    [NUM_BANKS],
-    output reg  signed [DATA_WIDTH-1:0] PortOneReadData     [NUM_BANKS],
-    output reg  signed [DATA_WIDTH-1:0] PortTwoReadData     [NUM_BANKS]
+    input  wire                 CLK,
+    input  wire                 ASYNC_RST,
+    input  wire                 SYNC_RST,
+    input  wire                 EN,
+    input  wire                 wren,
+    input  wire [AddrWidth-1:0] wraddr,
+    input  wire [7:0]           wrdata,
+    input  wire [AddrWidth-1:0] rdaddr,
+    output reg  [7:0]           rddata
 );
-    genvar bank;
-    generate
-        for (bank = 0; bank < NUM_BANKS; bank++) begin : gen_bank
-            reg [DATA_WIDTH-1:0] mem [BANK_DEPTH];
+    reg  [DataWidth-1:0]            mem [(1 << ADDR_WIDTH)][NO_BANKS];
+    wire [ADDR_WIDTH-1:0]           wr_word_addr;
+    wire [ADDR_WIDTH-1:0]           rd_word_addr;
+    wire [$clog2(NO_BANKS)-1:0]     wr_bank;
+    wire [$clog2(NO_BANKS)-1:0]     rd_bank;
+    wire [$clog2(BytesPerWord)-1:0] wr_byte_addr;
+    wire [$clog2(BytesPerWord)-1:0] rd_byte_addr;
 
-            // Read block
-            always @(posedge CLK or negedge ASYNC_RST) begin
-                if (~ASYNC_RST) begin
-                    PortOneReadData[bank] <= 'd0;
-                    PortTwoReadData[bank] <= 'd0;
-                end
-                else if (EN) begin
-                    if (SYNC_RST) begin
-                        PortOneReadData[bank] <= 'd0;
-                        PortTwoReadData[bank] <= 'd0;
-                    end
-                    else begin
-                        if (PortOneReadValid[bank]) begin
-                            PortOneReadData[bank] <= mem[PortOneReadAddress[bank]];
-                        end
-                        if (PortTwoReadValid[bank]) begin
-                            PortTwoReadData[bank] <= mem[PortTwoReadAddress[bank]];
-                        end
-                    end
-                end
-            end
+    assign wr_word_addr = wraddr[AddrWidth-1:AddrWidth-ADDR_WIDTH];
+    assign rd_word_addr = rdaddr[AddrWidth-1:AddrWidth-ADDR_WIDTH];
+    assign wr_bank      = wraddr[$clog2(BytesPerWord)+$clog2(NO_BANKS)-1:$clog2(BytesPerWord)];
+    assign rd_bank      = rdaddr[$clog2(BytesPerWord)+$clog2(NO_BANKS)-1:$clog2(BytesPerWord)];
+    assign wr_byte_addr = wraddr[$clog2(BytesPerWord)-1:0];
+    assign rd_byte_addr = rdaddr[$clog2(BytesPerWord)-1:0];
 
-            // Write block
-            always @(posedge CLK) begin
-                if (EN) begin
-                    if (PortOneWriteValid[bank]) begin
-                        mem[PortOneWriteAddress[bank]] <= PortOneWriteData[bank];
-                    end
-                    if (PortTwoWriteValid[bank]) begin
-                        mem[PortTwoWriteAddress[bank]] <= PortTwoWriteData[bank];
+    always @(posedge CLK) begin
+        if (EN & !SYNC_RST) begin
+            if (wren) begin
+                for (integer i = 0; i < BytesPerWord; i++) begin
+                    if (i == wr_byte_addr) begin
+                        mem[wr_word_addr][wr_bank][8*i+:8] <= wrdata;
                     end
                 end
             end
         end
-    endgenerate
-endmodule
+    end
 
+    always @(posedge CLK or negedge ASYNC_RST) begin
+        if (~ASYNC_RST) begin
+            rddata <= 0;
+        end
+        else if (EN) begin
+            if (SYNC_RST) begin
+                rddata <= 0;
+            end
+            else begin
+                for (integer i = 0; i < BytesPerWord; i++) begin
+                    if (i == rd_byte_addr) begin
+                        rddata <= mem[rd_word_addr][rd_bank][8*i+:8];
+                    end
+                end
+            end
+        end
+    end
+endmodule
