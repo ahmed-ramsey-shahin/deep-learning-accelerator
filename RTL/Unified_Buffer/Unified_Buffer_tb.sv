@@ -1,21 +1,28 @@
 `timescale 1ns/1ps
 
 module Unified_Buffer_tb();
-    parameter  integer SA_LENGTH=2;
-    parameter  integer ADDR_WIDTH=3;
-    parameter  integer NO_BANKS=4;
+    parameter  integer SA_LENGTH=256;
+    parameter  integer ADDR_WIDTH=10;
+    parameter  integer NO_BANKS=8;
     localparam integer DataWidth=8*SA_LENGTH;
-    localparam integer AddrWidth=ADDR_WIDTH+$clog2(NO_BANKS);
+    localparam integer BytesPerWord=DataWidth/8;
+    localparam integer AddrWidth=ADDR_WIDTH+$clog2(NO_BANKS)+$clog2(BytesPerWord);
 
-    bit                   CLK;
-    logic                 ASYNC_RST;
-    logic                 SYNC_RST;
-    logic                 EN;
-    logic                 wren;
-    logic [AddrWidth-1:0] wraddr;
-    logic [DataWidth-1:0] wrdata;
-    logic [AddrWidth-1:0] rdaddr;
-    logic [DataWidth-1:0] rddata;
+    bit                                        CLK;
+    logic                                      ASYNC_RST;
+    logic                                      SYNC_RST;
+    logic                                      EN;
+    logic                                      wren;
+    logic [AddrWidth-1:0]                      wraddr;
+    logic [DataWidth-1:0]                      wrdata;
+    logic [AddrWidth-1:0]                      rdaddr;
+    logic [DataWidth-1:0]                      rddata;
+    logic                                      bwren;
+    logic [AddrWidth-$clog2(BytesPerWord)-1:0] bwraddr;
+    logic [DataWidth-1:0]                      bwrdata;
+    logic                                      brden;
+    logic [AddrWidth-$clog2(BytesPerWord)-1:0] brdaddr;
+    logic [DataWidth-1:0]                      brddata;
 
     always #5 CLK = ~CLK;
 
