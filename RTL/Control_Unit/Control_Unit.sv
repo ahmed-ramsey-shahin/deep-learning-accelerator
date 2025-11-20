@@ -113,7 +113,9 @@ module Control_Unit #(
         ns = cs;
         case (cs)
             prepare: begin
-                ns = execute;
+                if (opcode != nop) begin
+                    ns = execute;
+                end
             end
             execute: begin
                 case (opcode)
@@ -194,6 +196,9 @@ module Control_Unit #(
                 case (cs)
                     prepare: begin
                         case (opcode)
+                            nop: begin
+                                pc <= pc + 1;
+                            end
                             mvin, mvout: begin
                                 UB_en   <= 1'b1;
                                 DRAM_en <= 1'b1;

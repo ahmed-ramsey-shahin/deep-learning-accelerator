@@ -182,7 +182,8 @@ module Top_Module;
         @(pc) $display("quantize finished");
         instruction  = {load, 20'd0, 6'b0001_10};
         @(pc) $display("load finished");
-        repeat(2) @(negedge CLK);
+        instruction  = {29'd0};
+        repeat(6) @(negedge CLK);
         $stop;
     end
 endmodule
