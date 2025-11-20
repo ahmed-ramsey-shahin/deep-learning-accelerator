@@ -1,0 +1,38 @@
+name: Generate GitLights Dashboard
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  generate-dashboard:
+    runs-on: ubuntu-latest
+    name: Generate Dashboard
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Generate GitLights dashboard
+        id: gitlights
+        uses: gitlights-app/analytics-gitlights-action@1.2.1
+        with:
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          run_id: ${{ github.run_id }}
+        
+      - name: Save Dashboard URL to File
+        if: success()
+        run: |
+          mkdir -p ./artifacts
+          echo "${{ steps.gitlights.outputs.image_url }}" > ./artifacts/dashboard_url.txt
+      
+      - name: Upload Dashboard URL
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitlights-dashboard-url
+          path: ./artifacts/dashboard_url.txt
+          retention-days: 5
+          if-no-files-found: error
