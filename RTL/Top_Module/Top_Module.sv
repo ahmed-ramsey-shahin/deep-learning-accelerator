@@ -18,35 +18,59 @@ module Top_Module;
     localparam integer InstructionSize=OpcodeWidth+DramAddrWidth+UbAddrWidth+ColWidth+RowWidth;
     // Instruction memory parameters
     parameter  integer IM_ADDR_WIDTH=32;
+    // General parameters
+    parameter  integer DATA_WIDTH=8;
+    localparam integer AccumulatorDataWidth = 16+$clog2(SA_LENGTH);
 
-    bit                         CLK;
-    logic                       ASYNC_RST;
-    logic                       SYNC_RST;
-    logic                       EN;
-    logic [InstructionSize-1:0] instruction;
-    logic [7:0]                 UB_rddata;
-    logic                       UB_wren;
-    logic [UbAddrWidth-1:0]     UB_wraddr;
-    logic [7:0]                 UB_wrdata;
-    logic [UbAddrWidth-1:0]     UB_rdaddr;
-    logic [7:0]                 DRAM_rddata;
-    logic [DramAddrWidth-1:0]   DRAM_rdaddr;
-    logic                       DRAM_wren;
-    logic [DramAddrWidth-1:0]   DRAM_wraddr;
-    logic [7:0]                 DRAM_wrdata;
-    logic                       DRAM_en;
-    logic                       UB_en;
-    logic [IM_ADDR_WIDTH-1:0]   pc;
-    logic                       test;
-    logic                       test_en;
-    logic [DramAddrWidth-1:0]   test_rdaddr;
-    logic                       test_wren;
-    logic [DramAddrWidth-1:0]   test_wraddr;
-    logic [7:0]                 test_wrdata;
-    logic [7:0]                 NORM_shift_ammount;
-    logic [7:0]                 NORM_z;
+    bit                                            CLK;
+    logic                                          ASYNC_RST;
+    logic                                          SYNC_RST;
+    logic                                          EN;
+    logic [InstructionSize-1:0]                    instruction;
+    logic                                          UB_brden;
+    logic [7:0]                                    UB_rddata;
+    logic [7:0]                                    UB_brddata [SA_LENGTH];
+    logic                                          UB_wren;
+    logic                                          UB_bwren;
+    logic [UbAddrWidth-1:0]                        UB_wraddr;
+    logic [UbAddrWidth-$clog2(UbBytesPerWord)-1:0] UB_bwraddr;
+    logic [7:0]                                    UB_wrdata;
+    logic [7:0]                                    UB_bwrdata [SA_LENGTH];
+    logic [UbAddrWidth-1:0]                        UB_rdaddr;
+    logic [UbAddrWidth-$clog2(UbBytesPerWord)-1:0] UB_brdaddr;
+    logic [7:0]                                    DRAM_rddata;
+    logic [DramAddrWidth-1:0]                      DRAM_rdaddr;
+    logic                                          DRAM_wren;
+    logic [DramAddrWidth-1:0]                      DRAM_wraddr;
+    logic [7:0]                                    DRAM_wrdata;
+    logic                                          DRAM_en;
+    logic                                          UB_en;
+    logic [IM_ADDR_WIDTH-1:0]                      pc;
+    logic [7:0]                                    NORM_shift_ammount;
+    logic [7:0]                                    NORM_z;
+    logic                                          test;
+    logic                                          test_en;
+    logic [DramAddrWidth-1:0]                      test_rdaddr;
+    logic                                          test_wren;
+    logic [DramAddrWidth-1:0]                      test_wraddr;
+    logic [7:0]                                    test_wrdata;
+    logic                                          SA_load;
+    logic                                          SA_en;
 
     always #5 CLK = ~CLK;
+
+    wire signed [DATA_WIDTH-1:0]           data_setup_outputs [SA_LENGTH];
+    wire signed [AccumulatorDataWidth-1:0] mmu_outputs        [SA_LENGTH];
+    wire signed [DATA_WIDTH-1:0]           norm_outputs       [SA_LENGTH];
+
+    typedef enum logic [OpcodeWidth-1:0] {
+        nop,
+        mvin,
+        mvout,
+        quantize,
+        load,
+        matmul
+    } opcode_e;
 
     Control_Unit #(
         .DRAM_DATA_WIDTH(DRAM_DATA_WIDTH),
@@ -85,18 +109,50 @@ module Top_Module;
         .wraddr(UB_wraddr),
         .wrdata(UB_wrdata),
         .rdaddr(UB_rdaddr),
-        .rddata(UB_rddata)
+        .rddata(UB_rddata),
+        .bwren(UB_bwren),
+        .brden(UB_brden),
+        .bwraddr(UB_bwraddr),
+        .brdaddr(UB_brdaddr),
+        .bwrdata(UB_bwrdata),
+        .brddata(UB_brddata)
+    );
+
+    Matrix_Multiply_Unit #(
+        .DATA_WIDTH(DATA_WIDTH),
+        .ACCUMULATOR_DATA_WIDTH(AccumulatorDataWidth),
+        .SA_LENGTH(SA_LENGTH)
+    ) mmu (
+        .CLK(CLK),
+        .ASYNC_RST(ASYNC_RST),
+        .SYNC_RST(SYNC_RST),
+        .EN(SA_en),
+        .LOAD(SA_load),
+        .Inputs(UB_brddata),
+        .Result(mmu_outputs)
+    );
+
+    Systolic_Data_Setup #(
+        .DATA_WIDTH(DATA_WIDTH),
+        .SA_LENGTH(SA_LENGTH)
+    ) data_setup (
+        .CLK(CLK),
+        .ASYNC_RST(ASYNC_RST),
+        .SYNC_RST(SYNC_RST),
+        .EN(SA_en),
+        .Inputs(UB_brddata),
+        .Outputs(data_setup_outputs)
     );
 
     Normalization #(
-        .IN_WIDTH(),
-        .OUT_WIDTH(16+$clog2(SA_LENGTH)),
+        .IN_WIDTH(AccumulatorDataWidth),
+        .OUT_WIDTH(DATA_WIDTH),
         .SA_LENGTH(SA_LENGTH)
     ) norm (
         .ShiftAmmount(NORM_shift_ammount),
-        .Z(NORM_z)
-        // .In(),
-        // .Out()
+        .Z(NORM_z),
+        .In(mmu_outputs),
+        .Out(norm_outputs)
     );
 
     initial begin
@@ -106,25 +162,27 @@ module Top_Module;
         #2;
         ASYNC_RST = 1'b1;
         @(negedge CLK);
-        instruction  = {2'b00, 8'b0010_0011, 10'b0011100000, 4'd3, 4'd3};
+        instruction  = {29'd0};
         for (integer i = 0; i < (1 << DramAddrWidth) + 1; i++) begin
             test        = 1'b1;
             test_en     = 1'b1;
             test_wren   = 1'b1;
             test_wraddr = i;
-            test_wrdata = i[DramAddrWidth-1:$clog2(DramBytesPerWord)] +
-                i[$clog2(DramBytesPerWord)-1:0];
+            test_wrdata = i;
             @(negedge CLK);
         end
         test = 1'b0;
         EN   = 1'b1;
         $display("test started");
-        instruction  = {3'b001, 8'b0010_0011, 10'b0011_10_0000, 4'd3, 4'd3};
+        instruction  = {mvin, 8'b0010_0011, 10'b0000_10_0000, 4'd10, 4'd12};
         @(pc) $display("mvin finished");
-        instruction  = {3'b010, 8'b0010_0011, 10'b0011_10_0000, 4'd3, 4'd3};
+        instruction  = {mvout, 8'b0010_0011, 10'b0011_10_0000, 4'd3, 4'd3};
         @(pc) $display("mvout finished");
-        instruction  = {3'b011, 6'd0, 10'b0011_10_0000, 10'b0011_10_0001};
+        instruction  = {quantize, 6'd0, 10'b0011_10_0000, 10'b0011_10_0001};
         @(pc) $display("quantize finished");
+        instruction  = {load, 20'd0, 6'b0001_10};
+        @(pc) $display("load finished");
+        repeat(2) @(negedge CLK);
         $stop;
     end
 endmodule
