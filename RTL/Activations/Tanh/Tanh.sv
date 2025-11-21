@@ -30,11 +30,12 @@ module Tanh (in, en, out);
                 end
             end else begin
                 out_temp[i] = 0;
+                sigmoid_in[i] = 0;
             end
         end
     end
 
-    Sigmoid #(.DATA_WIDTH(DATA_WIDTH+2), .SA_LENGTH(SA_LENGTH), .S(S)) dut (.in(sigmoid_in), .en(en), .out(sigmoid_out));
+    Sigmoid #(.DATA_WIDTH(DATA_WIDTH+2), .SA_LENGTH(SA_LENGTH), .S(S)) sig (.in(sigmoid_in), .en(en), .out(sigmoid_out));
 
     assign out = out_temp;
 endmodule
