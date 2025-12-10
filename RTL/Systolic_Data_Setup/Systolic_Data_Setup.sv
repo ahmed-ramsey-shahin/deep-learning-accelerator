@@ -1,6 +1,7 @@
 module Systolic_Data_Setup #(
     parameter integer DATA_WIDTH=8,
-    parameter integer SA_LENGTH=256
+    parameter integer SA_LENGTH=256,
+    parameter bit     REVERSE=1'b0
 ) (
     input  wire                         CLK,
     input  wire                         ASYNC_RST,
@@ -20,8 +21,8 @@ module Systolic_Data_Setup #(
                 .SYNC_RST(SYNC_RST),
                 .ASYNC_RST(ASYNC_RST),
                 .EN(EN),
-                .In(Inputs[i]),
-                .Out(Outputs[i])
+                .In(Inputs[REVERSE ? SA_LENGTH - 1 - i : i]),
+                .Out(Outputs[REVERSE ? SA_LENGTH - 1 - i : i])
             );
         end
     endgenerate
